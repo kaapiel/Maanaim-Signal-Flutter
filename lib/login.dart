@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maanaim_signal/signal.dart';
 
-void main() => runApp(SemaforoMaanaim());
-
-class SemaforoMaanaim extends StatelessWidget {
+class Login extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Semáforo Maanaim',
+      title: 'Login',
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: MyHomePage(title: 'Semáforo Maanaim'),
+      home: LoginPage(title: 'Splash Semáfoto'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  LoginPage({Key key, this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -32,11 +31,22 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _LoginPageState extends State<LoginPage> {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final emailController = TextEditingController();
+  final passController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    emailController.dispose();
+    passController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -55,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(
+        child: ListView(
           // Column is also a layout widget. It takes a list of children and
           // arranges them vertically. By default, it sizes itself to fit its
           // children horizontally, and tries to be as tall as its parent.
@@ -70,7 +81,6 @@ class _MyHomePageState extends State<MyHomePage> {
           // center the children vertically; the main axis here is the vertical
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
 
             Container (
@@ -84,20 +94,21 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: EdgeInsets.all(30),
             ),
             Container (
-             width: 350,
-             child: TextField(
-               obscureText: false,
-               style: style,
-               keyboardType: TextInputType.emailAddress,
-               maxLength: 50,
-               decoration: InputDecoration(
-                   contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                   hintText: "Email",
-                   border: OutlineInputBorder(
-                       borderRadius: BorderRadius.circular(32.0)
-                   )
-               ),
-             ),
+              width: 350,
+              child: TextField(
+                obscureText: false,
+                style: style,
+                keyboardType: TextInputType.emailAddress,
+                maxLength: 50,
+                controller: emailController,
+                decoration: InputDecoration(
+                    contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                    hintText: "Email",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(32.0)
+                    )
+                ),
+              ),
             ),
             Container(
               width: 350,
@@ -105,10 +116,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 obscureText: true,
                 style: style,
                 maxLength: 16,
+                controller: passController,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                     hintText: "Senha",
-
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(32.0)
                     )
@@ -124,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: MaterialButton(
                   minWidth: MediaQuery.of(context).size.width,
                   padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                  onPressed: (){},
+                  onPressed: () => _validateCredentials("${emailController.text}", "${passController.text}"),
                   child: Text( "Login",
                     textAlign: TextAlign.center,
                     style: style.copyWith(
@@ -135,9 +146,51 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
+            Padding(
+              padding: EdgeInsets.all(30),
+            ),
+            Container(
+              width: 350,
+              child: Material (
+                elevation: 5.0,
+                borderRadius: BorderRadius.circular(30.0),
+                color: Colors.deepOrange,
+                child: MaterialButton(
+                  minWidth: MediaQuery.of(context).size.width,
+                  padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text( "Voltar para Splash",
+                    textAlign: TextAlign.center,
+                    style: style.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ),
     );
+  }
+
+  _validateCredentials(String email, String pass) {
+
+    String message = "";
+
+    if (email.isEmpty | pass.isEmpty) {
+      message = "Credentials must not be empty";
+    } else if (pass == "123"){
+      Navigator.push(context, MaterialPageRoute(
+        builder: (context) => Signal()
+      ));
+    } else {
+      message = "Invalid username or password";
+    }
+    final snackBar = SnackBar(content: Text(message));
+    scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }

@@ -1,4 +1,4 @@
-#Tue Feb 11 20:30:24 BRST 2020
+#Wed Feb 12 15:24:36 BRST 2020
 base.0=/Users/gfraga/Documents/Git/maanaim_signal/build/app/intermediates/dex/debug/mergeDexDebug/out/classes.dex
 path.0=classes.dex
 renamed.0=classes.dex
