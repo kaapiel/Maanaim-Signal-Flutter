@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:timeline_list/timeline.dart';
+import 'package:maanaim_signal/timeline_data.dart';
+import 'package:timeline_list/timeline_model.dart';
 
 class Signal extends StatelessWidget {
   // This widget is the root of your application.
@@ -23,53 +26,98 @@ class SignalPage extends StatefulWidget {
 }
 
 class _SignalPageState extends State<SignalPage> {
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  final PageController pageController =
+  PageController(initialPage: 1, keepPage: true);
+  int pageIx = 1;
 
   @override
   Widget build(BuildContext context) {
+
+    List<Widget> pages = [
+      timelineModel(TimelinePosition.Left),
+      timelineModel(TimelinePosition.Center),
+      timelineModel(TimelinePosition.Right)
+
+    ];
+
     return Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: ListView(
-          children: <Widget>[
-            Container(
-              width: 350,
-              child: Image(
-                image: AssetImage("assets/maanaim.png"),
+        bottomNavigationBar: BottomNavigationBar(
+            currentIndex: pageIx,
+            onTap: (i) => pageController.animateToPage(i,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut),
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.format_align_left),
+                title: Text("LEFT"),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20),
-            ),
-            Container(
-              width: 200,
-              child: Material (
-                elevation: 5.0,
-                borderRadius: BorderRadius.circular(30.0),
-                color: Colors.deepOrange,
-                child: MaterialButton(
-                  minWidth: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text( "Voltar para login",
-                    textAlign: TextAlign.center,
-                    style: style.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                    ),
-                  ),
-                ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.format_align_center),
+                title: Text("CENTER"),
               ),
-            )
-          ],
+              BottomNavigationBarItem(
+                icon: Icon(Icons.format_align_right),
+                title: Text("RIGHT"),
+              ),
+            ]),
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-    );
+        body: PageView(
+          onPageChanged: (i) => setState(() => pageIx = i),
+          controller: pageController,
+          children: pages,
+        ));
+  }
+
+  timelineModel(TimelinePosition position) => Timeline.builder(
+      itemBuilder: centerTimelineBuilder,
+      itemCount: doodles.length,
+      physics: position == TimelinePosition.Left
+          ? ClampingScrollPhysics()
+          : BouncingScrollPhysics(),
+      position: position);
+
+  TimelineModel centerTimelineBuilder(BuildContext context, int i) {
+    final doodle = doodles[i];
+    final textTheme = Theme.of(context).textTheme;
+    return TimelineModel(
+        Card(
+          margin: EdgeInsets.symmetric(vertical: 16.0),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+          clipBehavior: Clip.antiAlias,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Image.network(doodle.doodle),
+                const SizedBox(
+                  height: 8.0,
+                ),
+                Text(doodle.time, style: textTheme.caption),
+                const SizedBox(
+                  height: 8.0,
+                ),
+                Text(
+                  doodle.name,
+                  style: textTheme.title,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  height: 8.0,
+                ),
+              ],
+            ),
+          ),
+        ),
+        position:
+        i % 2 == 0 ? TimelineItemPosition.right : TimelineItemPosition.left,
+        isFirst: i == 0,
+        isLast: i == doodles.length,
+        iconBackground: doodle.iconBackground,
+        icon: doodle.icon);
   }
 }
