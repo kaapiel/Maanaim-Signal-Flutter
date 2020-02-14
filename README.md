@@ -48,7 +48,7 @@ This repository's issue tracker is only for bugs and feature requests.
 
 <h1 id="license">License :page_facing_up:</h1>
 
-Copyright 2019 Gabriel Aguido Fraga
+Copyright 2020 Gabriel Aguido Fraga
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
