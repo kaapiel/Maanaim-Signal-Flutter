@@ -9,9 +9,6 @@ jobs:
     docker:
       - image: cirrusci/flutter:v1.5.8 
 
-    branches:
-      only: master
-
     steps:
       - checkout
 
