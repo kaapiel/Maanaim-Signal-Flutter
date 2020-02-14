@@ -5,7 +5,7 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=maanaim-signal-flutter&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=maanaim-signal-flutter)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=maanaim-signal-flutter&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=maanaim-signal-flutter)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=maanaim-signal-flutter&metric=security_rating)](https://sonarcloud.io/dashboard?id=maanaim-signal-flutter)
-![CircleCI](https://img.shields.io/circleci/build/github/kaapiel/Maanaim-Signal-Flutter/master)
+![CircleCI](https://img.shields.io/circleci/build/github/kaapiel/maanaim-signal-flutter/master)
 [![API](https://img.shields.io/badge/API-26%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=26)
 
 # Wearever you are
