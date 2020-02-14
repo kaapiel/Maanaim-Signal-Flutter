@@ -9,7 +9,7 @@
 [![API](https://img.shields.io/badge/API-26%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=26)
 
 # Maanaim Signal Flutter
-Know the current quality of your system, real-time
+Maanaim IC management by signal
 
 ## Table of Contents
 1. [Quick Start](#quick-start)
