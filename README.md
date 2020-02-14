@@ -24,12 +24,6 @@ Install this wear app on any Android wear device to test it!
 
 <br/>
 
-<h2 id="examples">Examples :eyes:</h2>
-
-![banner](https://raw.github.com/kaapiel/Raw-content/master/Maanaim-Signal-Flutter/example-1.png)
-
-<br/>
-
 <h2 id="report">Questions & Issues :thinking:</h2>
 
 This repository's issue tracker is only for bugs and feature requests.  
