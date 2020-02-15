@@ -30,56 +30,34 @@ class _SplashPageState extends State<SplashPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
+  void initState() {
+    _getThingsOnStartup().then((value){
+      print('Async done');
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context) => Login()
+      ));
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: ListView(
-          children: <Widget>[
-
-            Container(
+        body: Center(
+          child: Container(
               width: 350,
               height: 150,
+              alignment: Alignment.center,
               child: Image(
                 image: AssetImage("assets/maanaim.png"),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(30),
-            ),
-            Container(
-              width: 200,
-              child: Material (
-                elevation: 5.0,
-                borderRadius: BorderRadius.circular(30.0),
-                color: Colors.deepOrange,
-                child: MaterialButton(
-                  minWidth: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Login()
-                        )
-                    );
-                  },
-                  child: Text( "Ir Para Login",
-                    textAlign: TextAlign.center,
-                    style: style.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
-      ),
     );
+  }
+
+  _getThingsOnStartup() async {
+    await Future.delayed(Duration(seconds: 3));
   }
 }
