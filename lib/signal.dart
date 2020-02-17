@@ -4,22 +4,28 @@ import 'package:maanaim_signal/timeline_data.dart';
 import 'package:timeline_list/timeline_model.dart';
 
 class Signal extends StatelessWidget {
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
+
+    final Map<bool,String> map = ModalRoute.of(context).settings.arguments;
+
     return MaterialApp(
-      title: 'Splash',
+      title: 'Semáforo',
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: SignalPage(title: 'Semáfoto'),
+      home: SignalPage(title: 'Semáforo', map: map),
     );
   }
 }
 
 class SignalPage extends StatefulWidget {
-  SignalPage({Key key, this.title}) : super(key: key);
+
+  SignalPage({Key key, this.title, this.map}) : super(key: key);
+
   final String title;
+  final Map<bool,String> map;
 
   @override
   _SignalPageState createState() => _SignalPageState();
@@ -27,6 +33,7 @@ class SignalPage extends StatefulWidget {
 
 class _SignalPageState extends State<SignalPage> {
 
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   final PageController pageController =
   PageController(initialPage: 1, keepPage: true);
   int pageIx = 1;
@@ -42,25 +49,7 @@ class _SignalPageState extends State<SignalPage> {
     ];
 
     return Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-            currentIndex: pageIx,
-            onTap: (i) => pageController.animateToPage(i,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.format_align_left),
-                title: Text("LEFT"),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.format_align_center),
-                title: Text("CENTER"),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.format_align_right),
-                title: Text("RIGHT"),
-              ),
-            ]),
+        key: scaffoldKey,
         appBar: AppBar(
           title: Text(widget.title),
         ),
@@ -68,7 +57,8 @@ class _SignalPageState extends State<SignalPage> {
           onPageChanged: (i) => setState(() => pageIx = i),
           controller: pageController,
           children: pages,
-        ));
+        )
+    );
   }
 
   timelineModel(TimelinePosition position) => Timeline.builder(

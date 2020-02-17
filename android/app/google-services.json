@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "797419569448",
+    "firebase_url": "https://maanaim-signal.firebaseio.com",
+    "project_id": "maanaim-signal",
+    "storage_bucket": "maanaim-signal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797419569448:android:ed4003a922a5362bd7901d",
+        "android_client_info": {
+          "package_name": "aguido.com.br.maanaim_signal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797419569448-pq45db3ru6llgkrqvfh1voukfd5p30n9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzV5B6jY3kTOvwJEBmoMwpp-sftXP750A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797419569448-pq45db3ru6llgkrqvfh1voukfd5p30n9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "797419569448-ujmok15n6t1okp01uj9h35daqb50skqb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "aguido.com.br.maanaimSignal"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

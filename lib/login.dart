@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maanaim_signal/signal.dart';
+import 'package:maanaim_signal/sign_in.dart';
 
 class Login extends StatelessWidget {
   // This widget is the root of your application.
@@ -11,7 +12,7 @@ class Login extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: LoginPage(title: 'Splash Semáfoto'),
+      home: LoginPage(title: 'Login'),
     );
   }
 }
@@ -34,6 +35,9 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     emailController.dispose();
     passController.dispose();
+    setState(() {
+
+    });
     super.dispose();
   }
 
@@ -51,6 +55,7 @@ class _LoginPageState extends State<LoginPage> {
             Container (
               width: 350,
               height: 150,
+              margin: EdgeInsets.fromLTRB(0, 80, 0, 0),
               child: Image (
                 image: AssetImage("assets/maanaim.png"),
               ),
@@ -60,8 +65,10 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Container (
               width: 350,
-              child: TextField(
+              child: TextFormField(
+                maxLines: 1,
                 obscureText: false,
+                autofocus: false,
                 style: style,
                 keyboardType: TextInputType.emailAddress,
                 maxLength: 50,
@@ -69,26 +76,38 @@ class _LoginPageState extends State<LoginPage> {
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                     hintText: "Email",
+                    icon: Icon(
+                      Icons.mail,
+                      color: Colors.grey,
+                    ),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(32.0)
                     )
                 ),
+                validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null
               ),
             ),
             Container(
               width: 350,
-              child: TextField(
+              child: TextFormField(
+                maxLines: 1,
                 obscureText: true,
+                autofocus: false,
                 style: style,
                 maxLength: 16,
                 controller: passController,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                     hintText: "Senha",
+                    icon: Icon(
+                      Icons.lock,
+                      color: Colors.grey,
+                    ),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(32.0)
                     )
                 ),
+                validator: (value) => value.isEmpty ? 'Password can\'t be empty' : null
               ),
             ),
             Container(
@@ -111,6 +130,14 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
+            SizedBox(
+              height: 50,
+            ),
+            _googleSignInButton(),
+            SizedBox(
+                height: 10
+            ),
+            _facebookSignInButton()
           ],
         ),
       ),
@@ -125,12 +152,97 @@ class _LoginPageState extends State<LoginPage> {
       message = "Credentials must not be empty";
     } else if (pass == "123"){
       Navigator.push(context, MaterialPageRoute(
-        builder: (context) => Signal()
+          builder: (context) => Signal()
       ));
     } else {
       message = "Invalid username or password";
     }
     final snackBar = SnackBar(content: Text(message));
     scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
+  Widget _facebookSignInButton() {
+    return OutlineButton(
+      splashColor: Colors.grey,
+      onPressed: () {
+        signInWithFacebook().then((Map<bool,String> map){
+          if (map.keys.iterator.moveNext()) {
+            Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return Signal();
+                  },
+                  settings: RouteSettings(
+                      arguments: map
+                  ),
+                )
+            );
+          }
+        });
+      },
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+      highlightElevation: 0,
+      borderSide: BorderSide(color: Colors.grey),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image(image: AssetImage("assets/facebook_logo.png"), height: 35.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(
+                'Sign in with Facebook',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey,
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _googleSignInButton() {
+    return OutlineButton(
+      splashColor: Colors.grey,
+      onPressed: () {
+        signInWithGoogle().whenComplete(() {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) {
+                return Signal();
+              },
+            ),
+          );
+        });
+      },
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+      highlightElevation: 0,
+      borderSide: BorderSide(color: Colors.grey),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image(image: AssetImage("assets/google_logo.png"), height: 35.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(
+                'Sign in with Google',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey,
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
