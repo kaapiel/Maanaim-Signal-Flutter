@@ -14,6 +14,7 @@ Maanaim IC management by signal
 ### To access SonarCloud data use this link: 
 ### https://sonarcloud.io/dashboard?id=maanaim-signal-flutter
 
+
 ### To access pipeline and CI data use this link: 
 ### https://circleci.com/gh/kaapiel/maanaim_signal_flutter
 
