@@ -46,8 +46,8 @@ class _SplashPageState extends State<SplashPage> {
       key: scaffoldKey,
         body: Center(
           child: Container(
-              width: 350,
-              height: 150,
+              width: 300,
+              height: 120,
               alignment: Alignment.center,
               child: Image(
                 image: AssetImage("assets/maanaim.png"),
