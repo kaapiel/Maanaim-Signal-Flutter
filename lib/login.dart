@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maanaim_signal/firebase_auth.dart';
 import 'package:maanaim_signal/signal.dart';
 import 'package:maanaim_signal/sign_in.dart';
 
@@ -18,8 +19,9 @@ class Login extends StatelessWidget {
 }
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key key, this.title}) : super(key: key);
+  LoginPage({Key key, this.title, this.auth}) : super(key: key);
   final String title;
+  final BaseAuth auth;
 
   @override
   _LoginPageState createState() => _LoginPageState();
