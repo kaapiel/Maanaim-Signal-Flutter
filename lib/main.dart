@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maanaim_signal/fade_transictions.dart';
 import 'package:maanaim_signal/login.dart';
 
 void main() => runApp(Splash());
@@ -32,9 +34,8 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     _getThingsOnStartup().then((value){
-      print('Async done');
-      Navigator.push(context, MaterialPageRoute(
-          builder: (context) => Login()
+      Navigator.push(context, FadeRoute(
+          page: Login()
       ));
     });
     super.initState();
