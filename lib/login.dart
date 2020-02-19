@@ -56,14 +56,11 @@ class _LoginPageState extends State<LoginPage> {
 
             Container (
               width: 300,
-              height: 120,
-              padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+              height: 200,
+              padding: EdgeInsets.fromLTRB(0, 20, 0, 50),
               child: Image (
                 image: AssetImage("assets/maanaim.png"),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(30),
             ),
             Container (
               margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
