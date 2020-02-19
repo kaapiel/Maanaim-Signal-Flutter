@@ -74,22 +74,23 @@ class _SignalPageState extends State<SignalPage> {
     final textTheme = Theme.of(context).textTheme;
     return TimelineModel(
         Card(
-          margin: EdgeInsets.symmetric(vertical: 16.0),
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+          margin: EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0)
+          ),
           clipBehavior: Clip.antiAlias,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Image.network(doodle.doodle),
                 const SizedBox(
-                  height: 8.0,
+                  height: 20,
                 ),
                 Text(doodle.time, style: textTheme.caption),
                 const SizedBox(
-                  height: 8.0,
+                  height: 0,
                 ),
                 Text(
                   doodle.name,
@@ -97,7 +98,7 @@ class _SignalPageState extends State<SignalPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(
-                  height: 8.0,
+                  height: 35,
                 ),
               ],
             ),

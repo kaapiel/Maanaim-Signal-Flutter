@@ -18,24 +18,24 @@ class Doodle {
 
 const List<Doodle> doodles = [
   Doodle(
-      name: "IC sem Auxiliar",
+      name: "IC sem auxiliar",
       time: "",
       content: "",
       doodle: "",
-      icon: Icon(Icons.assistant_photo, color: Colors.white),
+      icon: Icon(Icons.assistant_photo, color: Colors.white, size: 40),
       iconBackground: Colors.red),
   Doodle(
       name: "IC sem membros suficiente",
       time: "",
       content: "",
       doodle: "",
-      icon: Icon(Icons.info, color: Colors.white),
+      icon: Icon(Icons.info, color: Colors.white, size: 40),
       iconBackground: Colors.yellow),
   Doodle(
       name: " IC pronta para multiplicar",
       time: "",
       content: "",
       doodle: "",
-      icon: Icon(Icons.check_circle, color: Colors.white),
+      icon: Icon(Icons.check_circle, color: Colors.white, size: 40),
       iconBackground: Colors.green)
 ];

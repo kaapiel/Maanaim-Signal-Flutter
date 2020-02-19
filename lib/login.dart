@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:maanaim_signal/firebase_auth.dart';
 import 'package:maanaim_signal/signal.dart';
 import 'package:maanaim_signal/sign_in.dart';
 
