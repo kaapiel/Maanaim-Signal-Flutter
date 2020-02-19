@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
             Container (
               width: 300,
               height: 120,
-              margin: EdgeInsets.fromLTRB(0, 80, 0, 0),
+              padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: Image (
                 image: AssetImage("assets/maanaim.png"),
               ),
@@ -162,7 +162,10 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(
                 height: 10
             ),
-            _facebookSignInButton()
+            _facebookSignInButton(),
+            SizedBox(
+                height: 30
+            ),
           ],
         ),
       ),
