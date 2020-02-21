@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maanaim_signal/register.dart';
 import 'package:maanaim_signal/signal.dart';
 import 'package:maanaim_signal/sign_in.dart';
 
@@ -18,19 +20,21 @@ class Login extends StatelessWidget {
 }
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key key, this.title, this.auth}) : super(key: key);
+  LoginPage({Key key, this.title}) : super(key: key);
   final String title;
-  final BaseAuth auth;
 
   @override
   _LoginPageState createState() => _LoginPageState();
+
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> implements BaseAuth {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final emailController = TextEditingController();
   final passController = TextEditingController();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  String authMessage = "";
 
   @override
   void dispose() {
@@ -140,7 +144,15 @@ class _LoginPageState extends State<LoginPage> {
                 child: MaterialButton(
                   minWidth: MediaQuery.of(context).size.width,
                   padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return Register();
+                          },
+                        )
+                    );
+                  },
                   child: Text( "Cadastrar",
                     textAlign: TextAlign.center,
                     style: style.copyWith(
@@ -170,19 +182,19 @@ class _LoginPageState extends State<LoginPage> {
 
   _validateCredentials(String email, String pass) {
 
-    String message = "";
-
-    if (email.isEmpty | pass.isEmpty) {
-      message = "Credentials must not be empty";
-    } else if (pass == "123"){
-      Navigator.push(context, MaterialPageRoute(
-          builder: (context) => Signal()
-      ));
-    } else {
-      message = "Invalid username or password";
+    if(email.isEmpty || pass.isEmpty){
+      authMessage = "Não podem haver campos vazios.";
+      final snackBar = SnackBar(content: Text(authMessage));
+      scaffoldKey.currentState.showSnackBar(snackBar);
+      return;
     }
-    final snackBar = SnackBar(content: Text(message));
-    scaffoldKey.currentState.showSnackBar(snackBar);
+
+    signIn(email, pass).then((String msg) {
+      final snackBar = SnackBar(content: Text(msg));
+      scaffoldKey.currentState.showSnackBar(snackBar);
+      return;
+    });
+
   }
 
   Widget _facebookSignInButton() {
@@ -285,4 +297,57 @@ class _LoginPageState extends State<LoginPage> {
         )
     );
   }
+
+  Future<String> signIn(String email, String password) async {
+
+    AuthResult result;
+
+    try {
+      result = await _firebaseAuth.signInWithEmailAndPassword(
+          email: email,
+          password: password
+      );
+    } catch (e) {
+      if (e.toString().contains("ERROR_INVALID_EMAIL")){
+        authMessage = "Formato de e-mail inválido";
+      } else if (e.toString().contains("ERROR_USER_NOT_FOUND")){
+        authMessage = "Usuário não cadastrado";
+      } else if (e.toString().contains("ERROR_WRONG_PASSWORD")){
+        authMessage = "Senha inválida";
+      }
+      final snackBar = SnackBar(content: Text(authMessage));
+      scaffoldKey.currentState.showSnackBar(snackBar);
+    }
+
+
+    FirebaseUser user = result.user;
+    return user.uid;
+  }
+
+  Future<String> signUp(String email, String password) async {
+    AuthResult result = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    FirebaseUser user = result.user;
+    return user.uid;
+  }
+
+  Future<FirebaseUser> getCurrentUser() async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    return user;
+  }
+
+  Future<void> signOut() async {
+    return _firebaseAuth.signOut();
+  }
+
+  Future<void> sendEmailVerification() async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    user.sendEmailVerification();
+  }
+
+  Future<bool> isEmailVerified() async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    return user.isEmailVerified;
+  }
+
 }
