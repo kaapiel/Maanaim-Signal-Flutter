@@ -209,6 +209,11 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
               signInWithFacebook().then((Map<bool,String> map){
 
                 if (map.keys.first) {
+
+                  // if user already set a function == true
+                  // then go to Admin/signal page.
+                  // Otherwise go to ContinueRegister Page
+
                   Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
@@ -264,6 +269,11 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
               signInWithGoogle().then((Map<bool,String> map) {
 
                 if (map.keys.first) {
+
+                  // if user already set a function == true
+                  // then go to Admin/signal page.
+                  // Otherwise go to ContinueRegister Page
+
                   Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
