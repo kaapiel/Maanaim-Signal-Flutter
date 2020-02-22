@@ -8,7 +8,7 @@ import 'dart:async';
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
 
-Future<String> signInWithGoogle() async {
+Future<Map<bool,String>> signInWithGoogle() async {
 
   final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
   final GoogleSignInAuthentication googleSignInAuthentication =
@@ -28,7 +28,10 @@ Future<String> signInWithGoogle() async {
   final FirebaseUser currentUser = await _auth.currentUser();
   assert(user.uid == currentUser.uid);
 
-  return 'signInWithGoogle succeeded: $user';
+  final Map<bool, String> map = {
+    (user != null ? true : false): user.email,
+  };
+  return map;
 }
 
 Future<Map<bool,String>> signInWithFacebook() async {

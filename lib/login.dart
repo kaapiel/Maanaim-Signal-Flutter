@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maanaim_signal/continue_register.dart';
 import 'package:maanaim_signal/register.dart';
-import 'package:maanaim_signal/signal.dart';
 import 'package:maanaim_signal/sign_in.dart';
 
 class Login extends StatelessWidget {
@@ -211,11 +211,8 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
                   Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
-                          return Signal();
+                          return ContinueRegister(map: map);
                         },
-                        settings: RouteSettings(
-                            arguments: map
-                        ),
                       )
                   );
                 }
@@ -258,11 +255,11 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
             padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
             splashColor: Colors.grey,
             onPressed: () {
-              signInWithGoogle().whenComplete(() {
+              signInWithGoogle().then((Map<bool,String> map) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) {
-                      return Signal();
+                      return ContinueRegister(map: map);
                     },
                   ),
                 );
@@ -324,10 +321,7 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
   }
 
   Future<String> signUp(String email, String password) async {
-    AuthResult result = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email, password: password);
-    FirebaseUser user = result.user;
-    return user.uid;
+    return null;
   }
 
   Future<FirebaseUser> getCurrentUser() async {
