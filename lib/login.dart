@@ -207,7 +207,8 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
             splashColor: Colors.grey,
             onPressed: () {
               signInWithFacebook().then((Map<bool,String> map){
-                if (map.keys.iterator.moveNext()) {
+
+                if (map.keys.first) {
                   Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
@@ -215,7 +216,12 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
                         },
                       )
                   );
+                } else {
+                  authMessage = "Falha no login";
+                  final snackBar = SnackBar(content: Text(authMessage));
+                  scaffoldKey.currentState.showSnackBar(snackBar);
                 }
+
               });
             },
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
@@ -256,13 +262,21 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
             splashColor: Colors.grey,
             onPressed: () {
               signInWithGoogle().then((Map<bool,String> map) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return ContinueRegister(map: map);
-                    },
-                  ),
-                );
+
+                if (map.keys.first) {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ContinueRegister(map: map);
+                        },
+                      )
+                  );
+                } else {
+                  authMessage = "Falha no login";
+                  final snackBar = SnackBar(content: Text(authMessage));
+                  scaffoldKey.currentState.showSnackBar(snackBar);
+                }
+
               });
             },
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
