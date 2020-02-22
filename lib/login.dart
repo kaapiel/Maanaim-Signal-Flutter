@@ -319,7 +319,6 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
       scaffoldKey.currentState.showSnackBar(snackBar);
     }
 
-
     FirebaseUser user = result.user;
     return user.uid;
   }
