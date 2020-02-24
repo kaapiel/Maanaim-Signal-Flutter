@@ -73,6 +73,7 @@ class _SignalFiltersPageState extends State<SignalFiltersPage> {
                   children: <Widget>[
                     InkWell(
                       child: Container(
+                        padding: EdgeInsets.fromLTRB(150, 0, 150, 0),
                         child: Column(
                           children: <Widget>[
                             Text("66",
@@ -82,19 +83,10 @@ class _SignalFiltersPageState extends State<SignalFiltersPage> {
                                   fontWeight: FontWeight.bold
                               ),
                             ),
-                            Icon(
-                              Icons.assistant_photo,
-                              size: 50,
-                              color: Colors.red,
-                            ),
+                            _getIcon(widget.status),
                           ],
                         ),
                       ),
-                      onTap: () {
-                        Navigator.push(context, FadeRoute(
-                            page: Signal()
-                        ));
-                      },
                     ),
                   ],
                 ),
@@ -259,4 +251,30 @@ class _SignalFiltersPageState extends State<SignalFiltersPage> {
     );
   }
 
+  Widget _getIcon(int status) {
+
+    switch (status) {
+      case 0:
+        return Icon(
+          Icons.assistant_photo,
+          size: 50,
+          color: Colors.red,
+        );
+        break;
+      case 1:
+       return Icon(
+          Icons.info,
+          size: 50,
+          color: Colors.yellow,
+        );
+        break;
+      case 2:
+        return Icon(
+          Icons.check_circle,
+          size: 50,
+          color: Colors.green,
+        );
+        break;
+    }
+  }
 }
