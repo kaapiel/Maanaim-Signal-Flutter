@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maanaim_signal/fade_transictions.dart';
-import 'package:maanaim_signal/logged_in_filters.dart';
 import 'package:maanaim_signal/login.dart';
 
 void main() => runApp(Splash());
@@ -36,7 +35,7 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     _getThingsOnStartup().then((value){
       Navigator.push(context, FadeRoute(
-          page: LoggedInFilters()
+          page: Login()
       ));
     });
     super.initState();
