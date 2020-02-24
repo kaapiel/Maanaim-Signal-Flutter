@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maanaim_signal/continue_register.dart';
+import 'package:maanaim_signal/logged_in_filters.dart';
 import 'package:maanaim_signal/register.dart';
 import 'package:maanaim_signal/sign_in.dart';
 
@@ -86,7 +88,7 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
                           borderRadius: BorderRadius.circular(32.0)
                       )
                   ),
-                  validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null
+                  validator: (value) => value.isEmpty ? 'O campo e-mail não pode estar vazio' : null
               ),
             ),
             Container(
@@ -109,7 +111,7 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
                           borderRadius: BorderRadius.circular(32.0)
                       )
                   ),
-                  validator: (value) => value.isEmpty ? 'Password can\'t be empty' : null
+                  validator: (value) => value.isEmpty ? 'O campo senha não pode estar vazio' : null
               ),
             ),
             Container(
@@ -210,17 +212,32 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
 
                 if (map.keys.first) {
 
-                  // if user already set a function == true
-                  // then go to Admin/signal page.
-                  // Otherwise go to ContinueRegister Page
+                  FirebaseDatabase.instance.reference().once().then((DataSnapshot ds){
 
-                  Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ContinueRegister(map: map);
-                        },
-                      )
-                  );
+                    var firebaseRetrieveData = new Map<String, dynamic>.from(ds.value);
+
+                    if (firebaseRetrieveData.toString().contains(map.values.first)){
+
+                      //mandar para admin/signal page
+                      Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return LoggedInFilters();
+                            },
+                          )
+                      );
+
+                    } else {
+                      Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return ContinueRegister(map: map);
+                            },
+                          )
+                      );
+                    }
+                  });
+
                 } else {
                   authMessage = "Falha no login";
                   final snackBar = SnackBar(content: Text(authMessage));
@@ -270,17 +287,22 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
 
                 if (map.keys.first) {
 
-                  // if user already set a function == true
-                  // then go to Admin/signal page.
-                  // Otherwise go to ContinueRegister Page
+                  FirebaseDatabase.instance.reference().once().then((DataSnapshot ds){
+                    if (ds.toString().contains(map.values.first)){
 
-                  Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ContinueRegister(map: map);
-                        },
-                      )
-                  );
+                      //mandar para admin/signal page
+
+                    } else {
+                      Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return ContinueRegister(map: map);
+                            },
+                          )
+                      );
+                    }
+                  });
+
                 } else {
                   authMessage = "Falha no login";
                   final snackBar = SnackBar(content: Text(authMessage));

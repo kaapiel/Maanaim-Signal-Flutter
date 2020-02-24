@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:maanaim_signal/fade_transictions.dart';
 import 'package:maanaim_signal/login.dart';
@@ -318,6 +319,9 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
       scaffoldKey.currentState.showSnackBar(snackBar);
       return;
     } else if (selectedFunction == "Pr. Presidente") {
+      
+
+
       //request pr president list size. If > 2 :
       //registerMessage = "Os pastores presidentes já foram cadastrados";
       //final snackBar = SnackBar(content: Text(registerMessage));
@@ -386,8 +390,6 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-
-
     }
 
     //if pr presidente size > 2 remove

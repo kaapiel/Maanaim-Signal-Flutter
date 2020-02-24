@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:maanaim_signal/sign_in.dart';
 
@@ -50,12 +51,7 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
   @override
   void initState() {
 
-    try {
-      var split = widget.map.values.first.split("email: ")[1].split(", pic")[0];
-      email = split;
-    } catch (e) {
-      email = widget.map.values.first;
-    }
+    email = widget.map.values.first;
 
     functions.add("Pr. Presidente");
     functions.add("Pr. de Região");
@@ -317,15 +313,38 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-
-
     }
 
-    //if pr presidente size > 2 remove
-    //final snackBar = SnackBar(content: Text("Os pastores presidentes já foram cadastrados"));
-    //scaffoldKey.currentState.showSnackBar(snackBar);
+    //pr. presidente insert
+    var child = FirebaseDatabase.instance.reference().child("u");
+    child.once().then((DataSnapshot ds){
 
-    //update info by email
+      Map<String, dynamic> map;
+      try {
+        map = new Map<String, dynamic>.from(ds.value);
+      } catch(e){
+        child.set({
+          'e0':email
+        });
+        return;
+      }
+
+      if (map.length >= 2) {
+        final snackBar = SnackBar(content: Text("Os pastores presidentes já foram cadastrados"));
+        scaffoldKey.currentState.showSnackBar(snackBar);
+        return;
+      } else {
+        var currentValue = map.keys.last.split("e")[1];
+        var newValue = int.parse(currentValue) + 1;
+        String newKey = "e" + newValue.toString();
+
+        child.update({
+          newKey:email
+        });
+      }
+    });
+
+
 
     //set function code
     //set ic name

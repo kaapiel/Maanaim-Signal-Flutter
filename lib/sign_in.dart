@@ -37,7 +37,7 @@ Future<Map<bool,String>> signInWithGoogle() async {
 Future<Map<bool,String>> signInWithFacebook() async {
 
   bool isLoggedIn = false;
-  var profile;
+  var email;
 
   var facebookLogin = FacebookLogin();
   var facebookLoginResult = await facebookLogin.logIn(['email']);
@@ -62,14 +62,14 @@ Future<Map<bool,String>> signInWithFacebook() async {
               'picture.height(200)'
               '&access_token=${facebookLoginResult.accessToken.token}');
 
-      profile = json.decode(graphResponse.body);
-      profile = profile.toString();
+      email = json.decode(graphResponse.body);
+      email = email.toString().split("email: ")[1].split(", pic")[0];
       isLoggedIn = true;
       break;
   }
 
   final Map<bool, String> map = {
-    isLoggedIn: profile,
+    isLoggedIn: email,
   };
 
   return map;
