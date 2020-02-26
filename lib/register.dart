@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:maanaim_signal/fade_transictions.dart';
 import 'package:maanaim_signal/login.dart';
@@ -42,8 +43,8 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
   final nameController = TextEditingController();
   List<String> functions = new List<String>();
   List<String> setores = new List<String>();
-  List<String> regioes = new List<String>();
   List<String> supervisoes = new List<String>();
+  List<String> regioes = new List<String>();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   @override
@@ -53,15 +54,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
     functions.add("Líder de Setor");
     functions.add("Supervisor");
     functions.add("Líder de IC");
-    regioes.add("Cinza");
-    regioes.add("Vermelha");
-    regioes.add("Laranja");
-    setores.add("joyce e flavio");
-    setores.add("set2");
-    setores.add("set3");
-    supervisoes.add("sup1");
-    supervisoes.add("sup2");
-    supervisoes.add("sup3");
+    _updateRegioesList();
     super.initState();
   }
 
@@ -71,9 +64,6 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
     passController.dispose();
     confirmPassController.dispose();
     nameController.dispose();
-    setState(() {
-
-    });
     super.dispose();
   }
 
@@ -93,7 +83,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
               height: 200,
               padding: EdgeInsets.fromLTRB(0, 20, 0, 50),
               child: Image(
-                image: AssetImage("assets/maanaim.png"),
+                image: AssetImage("assets/logo_farol.jpeg"),
               ),
             ),
             Container(
@@ -193,7 +183,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
                 },
               ),
             ),
-            _handleFuction(),
+            _handleContainerDropDowns(),
             Container(
               margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: Material (
@@ -213,6 +203,9 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
                   ),
                 ),
               ),
+            ),
+            SizedBox(
+                height: 20
             ),
           ],
         ),
@@ -272,26 +265,22 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
     return user.uid;
   }
 
-  Widget _handleFuction() {
+  Widget _handleContainerDropDowns() {
 
     if (selectedFunction == "Pr. de Região") {
-      //get regioes
-      return _getRegioesDropDown(regioes);
+      return _getRegioesDropDown();
 
     } else if (selectedFunction == "Líder de Setor") {
-      //get regioes
-      return _getSetorDropDown("Nome do setor", regioes);
+      return _getSetorContainer("Nome do setor");
 
     } else if (selectedFunction == "Supervisor") {
-      //get regioes
-      //get setores
-      return _getSupervisaoDropDown("Nome da supervisão", regioes, setores);
+      return _getSupervisaoContainer("Nome da supervisão");
 
     } else if (selectedFunction == "Líder de IC"){
       //get regioes
       //get setores
       //get supervisoes
-      return _getICDropDown("Nome da IC", regioes, setores, supervisoes);
+      return _getICContainer("Nome da IC");
     }
     return SizedBox(
         height: 20
@@ -319,19 +308,136 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
       scaffoldKey.currentState.showSnackBar(snackBar);
       return;
     } else if (selectedFunction == "Pr. Presidente") {
-      
 
+      var child = FirebaseDatabase.instance.reference().child("u");
+      child.once().then((DataSnapshot ds){
 
-      //request pr president list size. If > 2 :
-      //registerMessage = "Os pastores presidentes já foram cadastrados";
-      //final snackBar = SnackBar(content: Text(registerMessage));
-      //scaffoldKey.currentState.showSnackBar(snackBar);
+        Map<String, dynamic> map;
+        try {
+          map = new Map<String, dynamic>.from(ds.value);
+        } catch(e){
+          child.set({
+            'e0':emailController.text
+          });
+
+          signUp(emailController.text, passController.text).then((String msg) {
+            if(msg.isNotEmpty){
+              registerMessage = "Usuário cadastrado com sucesso";
+              final snackBar = SnackBar(content: Text(registerMessage));
+              scaffoldKey.currentState.showSnackBar(snackBar);
+
+              _waitForUserToRead().then((value){
+                Navigator.push(context, FadeRoute(
+                    page: Login()
+                ));
+              });
+
+              return;
+            }
+          });
+
+          return;
+        }
+
+        if (map.length >= 2) {
+          final snackBar = SnackBar(content: Text("Os pastores presidentes já foram cadastrados"));
+          scaffoldKey.currentState.showSnackBar(snackBar);
+          return;
+        } else {
+          var currentValue = map.keys.last.split("e")[1];
+          var newValue = int.parse(currentValue) + 1;
+          String newKey = "e" + newValue.toString();
+
+          child.update({
+            newKey:emailController.text
+          });
+
+          signUp(emailController.text, passController.text).then((String msg) {
+            if(msg.isNotEmpty){
+              registerMessage = "Usuário cadastrado com sucesso";
+              final snackBar = SnackBar(content: Text(registerMessage));
+              scaffoldKey.currentState.showSnackBar(snackBar);
+
+              _waitForUserToRead().then((value){
+                Navigator.push(context, FadeRoute(
+                    page: Login()
+                ));
+              });
+
+              return;
+            }
+          });
+
+        }
+
+      });
+
     } else if (selectedFunction == "Pr. de Região") {
       if (selectedRegion == "Selecione uma Região"){
         registerMessage = selectedRegion+"!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
+      } else {
+
+        var child;
+        selectedRegion == "Cinza" ? child = FirebaseDatabase.instance.reference().child("regs").child("0").child("u") :
+        selectedRegion == "Laranja" ? child = FirebaseDatabase.instance.reference().child("regs").child("1").child("u") :
+        child = FirebaseDatabase.instance.reference().child("regs").child("2").child("u");
+
+        child.once().then((DataSnapshot ds){
+
+          Map<String, dynamic> map;
+          try {
+            map = new Map<String, dynamic>.from(ds.value);
+          } catch(e){
+            child.set({
+              'e0':emailController.text
+            });
+
+            signUp(emailController.text, passController.text).then((String msg) {
+              if(msg.isNotEmpty){
+                registerMessage = "Usuário cadastrado com sucesso";
+                final snackBar = SnackBar(content: Text(registerMessage));
+                scaffoldKey.currentState.showSnackBar(snackBar);
+
+                _waitForUserToRead().then((value){
+                  Navigator.push(context, FadeRoute(
+                      page: Login()
+                  ));
+                });
+
+                return;
+              }
+            });
+            return;
+          }
+
+          var currentValue = map.keys.last.split("e")[1];
+          var newValue = int.parse(currentValue) + 1;
+          String newKey = "e" + newValue.toString();
+
+          child.update({
+            newKey:emailController.text
+          });
+
+          signUp(emailController.text, passController.text).then((String msg) {
+            if(msg.isNotEmpty){
+              registerMessage = "Usuário cadastrado com sucesso";
+              final snackBar = SnackBar(content: Text(registerMessage));
+              scaffoldKey.currentState.showSnackBar(snackBar);
+
+              _waitForUserToRead().then((value){
+                Navigator.push(context, FadeRoute(
+                    page: Login()
+                ));
+              });
+
+              return;
+            }
+          });
+        });
+
       }
     } else if (selectedFunction == "Líder de Setor") {
       if (selectedRegion == "Selecione uma Região"){
@@ -339,6 +445,72 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
+      } else {
+
+
+
+        var child;
+        selectedRegion == "Cinza" ? child = FirebaseDatabase.instance.reference().child("regs").child("0").child("u") :
+        selectedRegion == "Laranja" ? child = FirebaseDatabase.instance.reference().child("regs").child("1").child("u") :
+        child = FirebaseDatabase.instance.reference().child("regs").child("2").child("u");
+
+
+        child.once().then((DataSnapshot ds){
+
+          Map<String, dynamic> map;
+          try {
+            map = new Map<String, dynamic>.from(ds.value);
+          } catch(e){
+            child.set({
+              'e0':emailController.text
+            });
+
+            signUp(emailController.text, passController.text).then((String msg) {
+              if(msg.isNotEmpty){
+                registerMessage = "Usuário cadastrado com sucesso";
+                final snackBar = SnackBar(content: Text(registerMessage));
+                scaffoldKey.currentState.showSnackBar(snackBar);
+
+                _waitForUserToRead().then((value){
+                  Navigator.push(context, FadeRoute(
+                      page: Login()
+                  ));
+                });
+
+                return;
+              }
+            });
+            return;
+          }
+
+          var currentValue = map.keys.last.split("e")[1];
+          var newValue = int.parse(currentValue) + 1;
+          String newKey = "e" + newValue.toString();
+
+          child.update({
+            newKey:emailController.text
+          });
+
+          signUp(emailController.text, passController.text).then((String msg) {
+            if(msg.isNotEmpty){
+              registerMessage = "Usuário cadastrado com sucesso";
+              final snackBar = SnackBar(content: Text(registerMessage));
+              scaffoldKey.currentState.showSnackBar(snackBar);
+
+              _waitForUserToRead().then((value){
+                Navigator.push(context, FadeRoute(
+                    page: Login()
+                ));
+              });
+
+              return;
+            }
+          });
+        });
+
+
+
+
       }
       if (nameController.text.isEmpty || nameController.text.length < 4){
         registerMessage = "Nome do setor inválido";
@@ -391,32 +563,6 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
         return;
       }
     }
-
-    //if pr presidente size > 2 remove
-    //final snackBar = SnackBar(content: Text("Os pastores presidentes já foram cadastrados"));
-    //scaffoldKey.currentState.showSnackBar(snackBar);
-
-
-    signUp(emailController.text, passController.text).then((String msg) {
-      if(msg.isNotEmpty){
-        registerMessage = "Usuário cadastrado com sucesso";
-        final snackBar = SnackBar(content: Text(registerMessage));
-        scaffoldKey.currentState.showSnackBar(snackBar);
-
-        _waitForUserToRead().then((value){
-          Navigator.push(context, FadeRoute(
-              page: Login()
-          ));
-        });
-
-        return;
-      }
-    });
-
-    //set function code
-    //set ic name
-    //set admin level
-
   }
 
   Widget _getFieldWithHint(String hint) {
@@ -449,7 +595,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
     );
   }
 
-  Widget _getRegioesDropDown(List<String> regioes){
+  Widget _getRegioesDropDown(){
     return Container (
       padding: EdgeInsets.fromLTRB(70, 0, 30, 20),
       child: DropdownButton<String>(
@@ -470,13 +616,16 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
         onChanged: (value) {
           setState(() {
             selectedRegion = value;
+            selectedSector = "Selecione um Setor";
+            selectedsupervision = "Selecione uma Supervisão";
+            _updateSetoresList();
           });
         },
       ),
     );
   }
 
-  Widget _getSetoresDropDown(List<String> setores){
+  Widget _getSetoresDropDown(){
     return Container (
       padding: EdgeInsets.fromLTRB(70, 0, 30, 20),
       child: DropdownButton<String>(
@@ -497,13 +646,14 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
         onChanged: (value) {
           setState(() {
             selectedSector = value;
+            _updateSupervisionList();
           });
         },
       ),
     );
   }
 
-  Widget _getSupervisoesDropDown(List<String> supervisoes){
+  Widget _getSupervisoesDropDown(){
     return Container (
       padding: EdgeInsets.fromLTRB(70, 0, 30, 20),
       child: DropdownButton<String>(
@@ -530,39 +680,152 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
     );
   }
 
-  Widget _getSetorDropDown(String hint, List<String> regioes) {
+  Widget _getSetorContainer(String hint) {
     return Container (
         child: Column(
           children: <Widget>[
-            _getRegioesDropDown(regioes),
+            _getRegioesDropDown(),
             _getFieldWithHint(hint)
           ],
         )
     );
   }
 
-  Widget _getSupervisaoDropDown(String hint, List<String> regioes, List<String> setores) {
+  Widget _getSupervisaoContainer(String hint) {
     return Container (
         child: Column(
           children: <Widget>[
-            _getRegioesDropDown(regioes),
-            _getSetoresDropDown(setores),
+            _getRegioesDropDown(),
+            _getSetoresDropDown(),
             _getFieldWithHint(hint)
           ],
         )
     );
   }
 
-  Widget _getICDropDown(String hint, List<String> regioes, List<String> setores, List<String> supervisoes) {
+  Widget _getICContainer(String hint) {
     return Container (
         child: Column(
           children: <Widget>[
-            _getRegioesDropDown(regioes),
-            _getSetoresDropDown(setores),
-            _getSupervisoesDropDown(supervisoes),
+            _getRegioesDropDown(),
+            _getSetoresDropDown(),
+            _getSupervisoesDropDown(),
             _getFieldWithHint(hint)
           ],
         )
     );
+  }
+
+  void _updateRegioesList() {
+    var regs;
+    regs = FirebaseDatabase.instance.reference().child("regs");
+    regs.once().then((DataSnapshot ds){
+
+      List<dynamic> list = new List<dynamic>.from(ds.value);
+      regioes = new List<String>();
+      for(dynamic regiao in list){
+        regioes.add(regiao['cor']);
+      }
+    });
+  }
+
+  void _updateSetoresList() {
+    var regs;
+    regs = FirebaseDatabase.instance.reference().child("regs").orderByChild("cor").equalTo(selectedRegion);
+    regs.once().then((DataSnapshot ds){
+
+      List<dynamic> list;
+      Map<dynamic,dynamic> map;
+
+      setState(() {
+        setores = new List<String>();
+      });
+      FocusScope.of(context).requestFocus(new FocusNode());
+
+      try {
+        list = new List<dynamic>.from(ds.value);
+
+        try {
+          for(dynamic setor in list.elementAt(0)['sets']){
+            setores.add(setor['n']);
+          }
+        } catch(e){
+
+          try {
+            for(dynamic setor in list.elementAt(1)['sets']){
+              setores.add(setor['n']);
+            }
+          } catch(e){
+            selectedSector = "Selecione um Setor";
+          }
+        }
+
+      } catch(e){
+        map = new Map<dynamic,dynamic>.from((ds.value));
+        for(dynamic setor in map['2']['sets']){
+          setores.add(setor['n']);
+        }
+      }
+    });
+  }
+
+  void _updateSupervisionList() {
+    var regs;
+    regs = FirebaseDatabase.instance.reference().child("regs").orderByChild("cor").equalTo(selectedRegion);
+    regs.once().then((DataSnapshot ds){
+
+      List<dynamic> list;
+      Map<dynamic,dynamic> map;
+
+      setState(() {
+        supervisoes = new List<String>();
+      });
+      FocusScope.of(context).requestFocus(new FocusNode());
+
+      try {
+        list = new List<dynamic>.from(ds.value);
+
+        try {
+          for(dynamic setor in list.elementAt(0)['sets']){
+            if(setor['n'] == selectedSector){
+
+              for(dynamic sups in setor['sups']){
+                supervisoes.add(sups['n']);
+              }
+              return;
+            }
+          }
+        } catch(e){
+
+          try {
+            for(dynamic setor in list.elementAt(1)['sets']){
+              if(setor['n'] == selectedSector){
+
+                for(dynamic sups in setor['sups']){
+                  supervisoes.add(sups['n']);
+                }
+                return;
+              }
+            }
+          } catch(e){
+            selectedsupervision = "Selecione um Setor";
+          }
+        }
+
+      } catch(e){
+        map = new Map<dynamic,dynamic>.from((ds.value));
+
+        for(dynamic setor in map['2']['sets']){
+
+          if(setor['n'] == selectedSector){
+
+            for(dynamic sups in setor['sups']){
+              supervisoes.add(sups['n']);
+            }
+            return;
+          }
+        }
+      }
+    });
   }
 }

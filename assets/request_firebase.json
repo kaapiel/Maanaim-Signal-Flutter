@@ -1,0 +1,117 @@
+regs = FirebaseDatabase.instance.reference().child("u");
+regs.once().then((DataSnapshot ds){
+
+List<dynamic> list = new List<dynamic>.from(ds.value);
+
+print("numero de pastores de regiao: ${list.length}");
+print("pastor 1: ${list.elementAt(0)}");
+print("\n\n");
+
+});
+
+regs = FirebaseDatabase.instance.reference().child("regs");
+regs.once().then((DataSnapshot ds){
+
+List<dynamic> list = new List<dynamic>.from(ds.value);
+
+print("numero de regioes: ${list.length}");
+print("regiao 1: ${list.elementAt(0)}");
+print("regiao 2: ${list.elementAt(1)}");
+print("regiao 3: ${list.elementAt(2)}");
+print("\n\n");
+
+});
+
+
+regs = FirebaseDatabase.instance.reference().child("regs").child("0");
+regs.once().then((DataSnapshot ds){
+
+Map<dynamic, dynamic> map = new Map<dynamic,dynamic>.from(ds.value);
+
+print("numero de indices: ${map.length}");
+print("indice cor regiao: ${map['cor']}");
+print("indice sets: ${map['sets']}");
+print("indice u: ${map['u']}");
+print("\n\n");
+
+});
+
+
+regs = FirebaseDatabase.instance.reference().child("regs").child("0").child("sets");
+regs.once().then((DataSnapshot ds){
+
+List<dynamic> list = new List<dynamic>.from(ds.value);
+
+print("numero de indices: ${list.length}");
+print("indice 1: ${list.elementAt(0)}");
+print("\n\n");
+
+});
+
+
+regs = FirebaseDatabase.instance.reference().child("regs").child("0").child("sets").child("0");
+regs.once().then((DataSnapshot ds){
+
+Map<dynamic, dynamic> map = new Map<dynamic,dynamic>.from(ds.value);
+
+print("numero de indices: ${map.length}");
+print("indice nome setor: ${map['n']}");
+print("indice sups: ${map['sups']}");
+print("indice u: ${map['u']}");
+print("\n\n");
+
+});
+
+
+regs = FirebaseDatabase.instance.reference().child("regs").child("0").child("sets").child("0").child("sups");
+regs.once().then((DataSnapshot ds){
+
+List<dynamic> list = new List<dynamic>.from(ds.value);
+
+print("numero de indices: ${list.length}");
+print("indice 1: ${list.elementAt(0)}");
+print("\n\n");
+
+});
+
+
+regs = FirebaseDatabase.instance.reference().child("regs").child("0").child("sets").child("0").child("sups").child("0");
+regs.once().then((DataSnapshot ds){
+
+Map<dynamic, dynamic> map = new Map<dynamic,dynamic>.from(ds.value);
+
+print("numero de indices: ${map.length}");
+print("indice nome supervisao: ${map['n']}");
+print("indice ics: ${map['ics']}");
+print("indice u: ${map['u']}");
+print("\n\n");
+
+});
+
+
+regs = FirebaseDatabase.instance.reference().child("regs").child("0").child("sets").child("0").child("sups").child("0")
+.child("ics");
+regs.once().then((DataSnapshot ds){
+
+List<dynamic> list = new List<dynamic>.from(ds.value);
+
+print("numero de indices: ${list.length}");
+print("indice 1: ${list.elementAt(0)}");
+print("\n\n");
+
+});
+
+
+regs = FirebaseDatabase.instance.reference().child("regs").child("0").child("sets").child("0").child("sups").child("0")
+.child("ics").child("0");
+regs.once().then((DataSnapshot ds){
+
+Map<dynamic, dynamic> map = new Map<dynamic,dynamic>.from(ds.value);
+
+print("numero de indices: ${map.length}");
+print("indice nome IC: ${map['n']}");
+print("indice status: ${map['s']}");
+print("indice u: ${map['u']}");
+print("\n\n");
+
+});

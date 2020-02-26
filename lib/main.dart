@@ -51,7 +51,7 @@ class _SplashPageState extends State<SplashPage> {
               height: 120,
               alignment: Alignment.center,
               child: Image(
-                image: AssetImage("assets/maanaim.png"),
+                image: AssetImage("assets/logo_farol.jpeg"),
               ),
             ),
         ),

@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
               height: 200,
               padding: EdgeInsets.fromLTRB(0, 20, 0, 50),
               child: Image (
-                image: AssetImage("assets/maanaim.png"),
+                image: AssetImage("assets/logo_farol.jpeg"),
               ),
             ),
             Container (
@@ -291,6 +291,13 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
                     if (ds.toString().contains(map.values.first)){
 
                       //mandar para admin/signal page
+                      Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return LoggedInFilters();
+                            },
+                          )
+                      );
 
                     } else {
                       Navigator.of(context).push(
