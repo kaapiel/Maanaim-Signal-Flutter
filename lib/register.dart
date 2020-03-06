@@ -308,8 +308,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
   }
 
   _validateRegister() {
-    if (emailController.text.isEmpty || passController.text.isEmpty ||
-        confirmPassController.text.isEmpty) {
+    if (emailController.text.isEmpty || passController.text.isEmpty || confirmPassController.text.isEmpty) {
       registerMessage = "Não podem haver campos vazios.";
       final snackBar = SnackBar(content: Text(registerMessage));
       scaffoldKey.currentState.showSnackBar(snackBar);
@@ -321,7 +320,6 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
       scaffoldKey.currentState.showSnackBar(snackBar);
       return;
     }
-
     if (selectedFunction == "Selecione sua função") {
       registerMessage = selectedFunction + "!";
       final snackBar = SnackBar(content: Text(registerMessage));

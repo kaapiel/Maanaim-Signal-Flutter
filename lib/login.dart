@@ -367,11 +367,19 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
       }
     }
 
-    FirebaseUser user = result.user;
+    Map<String, FirebaseUser> map;
 
-    final Map<String, FirebaseUser> map = {
-      authMessage: user,
-    };
+    try {
+
+      FirebaseUser user = result.user;
+      map = {
+        authMessage: user,
+      };
+    } catch(e){
+      map = {
+        authMessage: null,
+      };
+    }
 
     return map;
   }
