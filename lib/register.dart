@@ -36,7 +36,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
   String selectedFunction = "Selecione sua função";
   String selectedRegion = "Selecione uma Região";
   String selectedSector = "Selecione um Setor";
-  String selectedsupervision = "Selecione uma Supervisão";
+  String selectedSupervision = "Selecione uma Supervisão";
   final emailController = TextEditingController();
   final passController = TextEditingController();
   final confirmPassController = TextEditingController();
@@ -46,6 +46,26 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
   List<String> supervisoes = new List<String>();
   List<String> regioes = new List<String>();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Você tem certeza?'),
+        content: new Text('Você quer sair do app'),
+        actions: <Widget>[
+          new FlatButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: new Text('Não'),
+          ),
+          new FlatButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: new Text('Sim'),
+          ),
+        ],
+      ),
+    )) ?? false;
+  }
 
   @override
   void initState() {
@@ -70,146 +90,149 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: ListView(
-          children: <Widget>[
-            Container(
-              width: 300,
-              height: 200,
-              padding: EdgeInsets.fromLTRB(0, 20, 0, 50),
-              child: Image(
-                image: AssetImage("assets/logo_farol.jpeg"),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: TextFormField(
-                controller: emailController,
-                maxLines: 1,
-                obscureText: false,
-                autofocus: false,
-                style: style,
-                keyboardType: TextInputType.emailAddress,
-                maxLength: 50,
-                decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(
-                        20.0, 15.0, 20.0, 15.0),
-                    hintText: "E-mail",
-                    icon: Icon(
-                      Icons.mail,
-                      color: Colors.grey,
-                    ),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32.0)
-                    )
+    return new WillPopScope(
+        onWillPop: _onWillPop,
+        child: Scaffold(
+          key: scaffoldKey,
+          appBar: AppBar(
+            title: Text(widget.title),
+          ),
+          body: Center(
+            child: ListView(
+              children: <Widget>[
+                Container(
+                  width: 300,
+                  height: 200,
+                  padding: EdgeInsets.fromLTRB(0, 20, 0, 50),
+                  child: Image(
+                    image: AssetImage("assets/logo_farol.jpeg"),
+                  ),
                 ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: TextFormField(
-                controller: passController,
-                maxLines: 1,
-                obscureText: true,
-                autofocus: false,
-                style: style,
-                maxLength: 16,
-                decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(
-                        20.0, 15.0, 20.0, 15.0),
-                    hintText: "Senha",
-                    icon: Icon(
-                      Icons.lock,
-                      color: Colors.grey,
-                    ),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32.0)
-                    )
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: TextFormField(
-                controller: confirmPassController,
-                maxLines: 1,
-                obscureText: true,
-                autofocus: false,
-                style: style,
-                maxLength: 16,
-                decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(
-                        20.0, 15.0, 20.0, 15.0),
-                    hintText: "Confirmar Senha",
-                    icon: Icon(
-                      Icons.lock,
-                      color: Colors.grey,
-                    ),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32.0)
-                    )
-                ),
-              ),
-            ),
-            Container (
-              padding: EdgeInsets.fromLTRB(70, 0, 30, 20),
-              child: DropdownButton<String>(
-                hint: Text(
-                  selectedFunction,
-                  style: Theme.of(context).textTheme.headline,
-                  textAlign: TextAlign.center,
-                ),
-                items: functions.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedFunction = value;
-                    selectedRegion = "Selecione uma Região";
-                    selectedSector = "Selecione um Setor";
-                    selectedsupervision = "Selecione uma Supervisão";
-                  });
-                },
-              ),
-            ),
-            _handleContainerDropDowns(),
-            Container(
-              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: Material (
-                elevation: 5.0,
-                borderRadius: BorderRadius.circular(30.0),
-                color: Colors.deepOrange,
-                child: MaterialButton(
-                  minWidth: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                  onPressed: () => _validateRegister(),
-                  child: Text( "Cadastrar",
-                    textAlign: TextAlign.center,
-                    style: style.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
+                Container(
+                  margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: TextFormField(
+                    controller: emailController,
+                    maxLines: 1,
+                    obscureText: false,
+                    autofocus: false,
+                    style: style,
+                    keyboardType: TextInputType.emailAddress,
+                    maxLength: 50,
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(
+                            20.0, 15.0, 20.0, 15.0),
+                        hintText: "E-mail",
+                        icon: Icon(
+                          Icons.mail,
+                          color: Colors.grey,
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(32.0)
+                        )
                     ),
                   ),
                 ),
-              ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: TextFormField(
+                    controller: passController,
+                    maxLines: 1,
+                    obscureText: true,
+                    autofocus: false,
+                    style: style,
+                    maxLength: 16,
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(
+                            20.0, 15.0, 20.0, 15.0),
+                        hintText: "Senha",
+                        icon: Icon(
+                          Icons.lock,
+                          color: Colors.grey,
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(32.0)
+                        )
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: TextFormField(
+                    controller: confirmPassController,
+                    maxLines: 1,
+                    obscureText: true,
+                    autofocus: false,
+                    style: style,
+                    maxLength: 16,
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(
+                            20.0, 15.0, 20.0, 15.0),
+                        hintText: "Confirmar Senha",
+                        icon: Icon(
+                          Icons.lock,
+                          color: Colors.grey,
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(32.0)
+                        )
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.fromLTRB(70, 0, 30, 20),
+                  child: DropdownButton<String>(
+                    hint: Text(
+                      selectedFunction,
+                      style: Theme.of(context).textTheme.headline,
+                      textAlign: TextAlign.center,
+                    ),
+                    items: functions.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedFunction = value;
+                        selectedRegion = "Selecione uma Região";
+                        selectedSector = "Selecione um Setor";
+                        selectedSupervision = "Selecione uma Supervisão";
+                      });
+                    },
+                  ),
+                ),
+                _handleContainerDropDowns(),
+                Container(
+                  margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Material (
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(30.0),
+                    color: Colors.deepOrange,
+                    child: MaterialButton(
+                      minWidth: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                      onPressed: () => _validateRegister(),
+                      child: Text( "Cadastrar",
+                        textAlign: TextAlign.center,
+                        style: style.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                    height: 20
+                ),
+              ],
             ),
-            SizedBox(
-                height: 20
-            ),
-          ],
-        ),
-      ),
+          ),
+        )
     );
   }
 
@@ -229,7 +252,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
   }
 
   @override
-  Future<String> signIn(String email, String password) {
+  Future<Map<String, FirebaseUser>> signIn(String email, String password) {
     return null;
   }
 
@@ -277,9 +300,6 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
       return _getSupervisaoContainer("Nome da supervisão");
 
     } else if (selectedFunction == "Líder de IC"){
-      //get regioes
-      //get setores
-      //get supervisoes
       return _getICContainer("Nome da IC");
     }
     return SizedBox(
@@ -288,14 +308,14 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
   }
 
   _validateRegister() {
-
     if (emailController.text.isEmpty || passController.text.isEmpty ||
-        confirmPassController.text.isEmpty){
+        confirmPassController.text.isEmpty) {
       registerMessage = "Não podem haver campos vazios.";
       final snackBar = SnackBar(content: Text(registerMessage));
       scaffoldKey.currentState.showSnackBar(snackBar);
       return;
-    } else if (passController.text != confirmPassController.text){
+    }
+    else if (passController.text != confirmPassController.text) {
       registerMessage = "As senhas não conferem";
       final snackBar = SnackBar(content: Text(registerMessage));
       scaffoldKey.currentState.showSnackBar(snackBar);
@@ -303,30 +323,29 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
     }
 
     if (selectedFunction == "Selecione sua função") {
-      registerMessage = selectedFunction+"!";
+      registerMessage = selectedFunction + "!";
       final snackBar = SnackBar(content: Text(registerMessage));
       scaffoldKey.currentState.showSnackBar(snackBar);
       return;
-    } else if (selectedFunction == "Pr. Presidente") {
-
+    }
+    else if (selectedFunction == "Pr. Presidente") {
       var child = FirebaseDatabase.instance.reference().child("u");
-      child.once().then((DataSnapshot ds){
-
+      child.once().then((DataSnapshot ds) {
         Map<String, dynamic> map;
         try {
           map = new Map<String, dynamic>.from(ds.value);
-        } catch(e){
+        } catch (e) {
           child.set({
-            'e0':emailController.text
+            'e0': emailController.text
           });
 
           signUp(emailController.text, passController.text).then((String msg) {
-            if(msg.isNotEmpty){
+            if (msg.isNotEmpty) {
               registerMessage = "Usuário cadastrado com sucesso";
               final snackBar = SnackBar(content: Text(registerMessage));
               scaffoldKey.currentState.showSnackBar(snackBar);
 
-              _waitForUserToRead().then((value){
+              _waitForUserToRead().then((value) {
                 Navigator.push(context, FadeRoute(
                     page: Login()
                 ));
@@ -340,7 +359,8 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
         }
 
         if (map.length >= 2) {
-          final snackBar = SnackBar(content: Text("Os pastores presidentes já foram cadastrados"));
+          final snackBar = SnackBar(
+              content: Text("Os pastores presidentes já foram cadastrados"));
           scaffoldKey.currentState.showSnackBar(snackBar);
           return;
         } else {
@@ -349,16 +369,16 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
           String newKey = "e" + newValue.toString();
 
           child.update({
-            newKey:emailController.text
+            newKey: emailController.text
           });
 
           signUp(emailController.text, passController.text).then((String msg) {
-            if(msg.isNotEmpty){
+            if (msg.isNotEmpty) {
               registerMessage = "Usuário cadastrado com sucesso";
               final snackBar = SnackBar(content: Text(registerMessage));
               scaffoldKey.currentState.showSnackBar(snackBar);
 
-              _waitForUserToRead().then((value){
+              _waitForUserToRead().then((value) {
                 Navigator.push(context, FadeRoute(
                     page: Login()
                 ));
@@ -367,41 +387,46 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
               return;
             }
           });
-
         }
-
       });
-
-    } else if (selectedFunction == "Pr. de Região") {
-      if (selectedRegion == "Selecione uma Região"){
-        registerMessage = selectedRegion+"!";
+    }
+    else if (selectedFunction == "Pr. de Região") {
+      if (selectedRegion == "Selecione uma Região") {
+        registerMessage = selectedRegion + "!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       } else {
-
         var child;
-        selectedRegion == "Cinza" ? child = FirebaseDatabase.instance.reference().child("regs").child("0").child("u") :
-        selectedRegion == "Laranja" ? child = FirebaseDatabase.instance.reference().child("regs").child("1").child("u") :
-        child = FirebaseDatabase.instance.reference().child("regs").child("2").child("u");
+        selectedRegion == "Cinza" ? child =
+            FirebaseDatabase.instance.reference().child("regs")
+                .child("0")
+                .child("u") :
+        selectedRegion == "Laranja" ? child =
+            FirebaseDatabase.instance.reference().child("regs")
+                .child("1")
+                .child("u") :
+        child = FirebaseDatabase.instance.reference().child("regs")
+            .child("2")
+            .child("u");
 
-        child.once().then((DataSnapshot ds){
-
+        child.once().then((DataSnapshot ds) {
           Map<String, dynamic> map;
           try {
             map = new Map<String, dynamic>.from(ds.value);
-          } catch(e){
+          } catch (e) {
             child.set({
-              'e0':emailController.text
+              'e0': emailController.text
             });
 
-            signUp(emailController.text, passController.text).then((String msg) {
-              if(msg.isNotEmpty){
+            signUp(emailController.text, passController.text).then((
+                String msg) {
+              if (msg.isNotEmpty) {
                 registerMessage = "Usuário cadastrado com sucesso";
                 final snackBar = SnackBar(content: Text(registerMessage));
                 scaffoldKey.currentState.showSnackBar(snackBar);
 
-                _waitForUserToRead().then((value){
+                _waitForUserToRead().then((value) {
                   Navigator.push(context, FadeRoute(
                       page: Login()
                   ));
@@ -418,16 +443,16 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
           String newKey = "e" + newValue.toString();
 
           child.update({
-            newKey:emailController.text
+            newKey: emailController.text
           });
 
           signUp(emailController.text, passController.text).then((String msg) {
-            if(msg.isNotEmpty){
+            if (msg.isNotEmpty) {
               registerMessage = "Usuário cadastrado com sucesso";
               final snackBar = SnackBar(content: Text(registerMessage));
               scaffoldKey.currentState.showSnackBar(snackBar);
 
-              _waitForUserToRead().then((value){
+              _waitForUserToRead().then((value) {
                 Navigator.push(context, FadeRoute(
                     page: Login()
                 ));
@@ -437,131 +462,297 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
             }
           });
         });
-
       }
-    } else if (selectedFunction == "Líder de Setor") {
-      if (selectedRegion == "Selecione uma Região"){
-        registerMessage = selectedRegion+"!";
+    }
+    else if (selectedFunction == "Líder de Setor") {
+      if (selectedRegion == "Selecione uma Região") {
+        registerMessage = selectedRegion + "!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
-      } else {
-
-
-
-        var child;
-        selectedRegion == "Cinza" ? child = FirebaseDatabase.instance.reference().child("regs").child("0").child("u") :
-        selectedRegion == "Laranja" ? child = FirebaseDatabase.instance.reference().child("regs").child("1").child("u") :
-        child = FirebaseDatabase.instance.reference().child("regs").child("2").child("u");
-
-
-        child.once().then((DataSnapshot ds){
-
-          Map<String, dynamic> map;
-          try {
-            map = new Map<String, dynamic>.from(ds.value);
-          } catch(e){
-            child.set({
-              'e0':emailController.text
-            });
-
-            signUp(emailController.text, passController.text).then((String msg) {
-              if(msg.isNotEmpty){
-                registerMessage = "Usuário cadastrado com sucesso";
-                final snackBar = SnackBar(content: Text(registerMessage));
-                scaffoldKey.currentState.showSnackBar(snackBar);
-
-                _waitForUserToRead().then((value){
-                  Navigator.push(context, FadeRoute(
-                      page: Login()
-                  ));
-                });
-
-                return;
-              }
-            });
-            return;
-          }
-
-          var currentValue = map.keys.last.split("e")[1];
-          var newValue = int.parse(currentValue) + 1;
-          String newKey = "e" + newValue.toString();
-
-          child.update({
-            newKey:emailController.text
-          });
-
-          signUp(emailController.text, passController.text).then((String msg) {
-            if(msg.isNotEmpty){
-              registerMessage = "Usuário cadastrado com sucesso";
-              final snackBar = SnackBar(content: Text(registerMessage));
-              scaffoldKey.currentState.showSnackBar(snackBar);
-
-              _waitForUserToRead().then((value){
-                Navigator.push(context, FadeRoute(
-                    page: Login()
-                ));
-              });
-
-              return;
-            }
-          });
-        });
-
-
-
-
       }
-      if (nameController.text.isEmpty || nameController.text.length < 4){
+      if (nameController.text.isEmpty || nameController.text.length < 4) {
         registerMessage = "Nome do setor inválido";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
+      } else {
+        var child;
+        selectedRegion == "Cinza" ? child =
+            FirebaseDatabase.instance.reference().child("regs")
+                .child("0")
+                .child("sets") :
+        selectedRegion == "Laranja" ? child =
+            FirebaseDatabase.instance.reference().child("regs")
+                .child("1")
+                .child("sets") :
+        child = FirebaseDatabase.instance.reference().child("regs")
+            .child("2")
+            .child("sets");
+
+        child.once().then((DataSnapshot ds) {
+          List<dynamic> list;
+
+          list = new List<dynamic>.from(ds.value);
+          int size = 0;
+
+          for (dynamic o in list) {
+            size++;
+          }
+
+          if (size == 0) {
+            child.child('0').update({
+              'n': nameController.text
+            });
+            child.child('0').child('u').update({
+              'e0': emailController.text
+            });
+          } else {
+            child.child(size.toString()).update({
+              'n': nameController.text
+            });
+            child.child(size.toString()).child('u').update({
+              'e0': emailController.text
+            });
+          }
+
+          signUp(emailController.text, passController.text).then((String msg) {
+            if (msg.isNotEmpty) {
+              registerMessage = "Usuário cadastrado com sucesso";
+              final snackBar = SnackBar(content: Text(registerMessage));
+              scaffoldKey.currentState.showSnackBar(snackBar);
+
+              _waitForUserToRead().then((value) {
+                Navigator.push(context, FadeRoute(
+                    page: Login()
+                ));
+              });
+
+              return;
+            }
+          });
+        });
       }
-    } else if (selectedFunction == "Supervisor") {
-      if (selectedRegion == "Selecione uma Região"){
-        registerMessage = selectedRegion+"!";
+    }
+    else if (selectedFunction == "Supervisor") {
+      if (selectedRegion == "Selecione uma Região") {
+        registerMessage = selectedRegion + "!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-      if (selectedSector == "Selecione um Setor"){
-        registerMessage = selectedSector+"!";
+      if (selectedSector == "Selecione um Setor") {
+        registerMessage = selectedSector + "!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-      if (nameController.text.isEmpty || nameController.text.length < 4){
+      if (nameController.text.isEmpty || nameController.text.length < 4) {
         registerMessage = "Nome da supervisão inválida";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-    } else if (selectedFunction == "Líder de IC") {
-      if (selectedRegion == "Selecione uma Região"){
-        registerMessage = selectedRegion+"!";
+
+      var child;
+      selectedRegion == "Cinza" ?
+      child = FirebaseDatabase.instance.reference().child("regs")
+          .child("0").child("sets").orderByChild("n")
+          .equalTo(selectedSector)
+          .reference() :
+
+      selectedRegion == "Laranja" ?
+      child = FirebaseDatabase.instance.reference().child("regs")
+          .child("1").child("sets").orderByChild("n")
+          .equalTo(selectedSector)
+          .reference() :
+
+      child =
+          FirebaseDatabase.instance.reference().child("regs").child("2").child(
+              "sets")
+              .orderByChild("n").equalTo(selectedSector).reference();
+
+      child.once().then((DataSnapshot ds) {
+        List<dynamic> list;
+        list = new List<dynamic>.from(ds.value);
+
+        int count = -1;
+        int counter = 0;
+        for (dynamic obj in list) {
+          count++;
+          if (obj['n'] == selectedSector) {
+            try {
+              var a = obj['sups'][0];
+
+              for (dynamic sup in obj['sups']) {
+                counter++;
+              }
+              child.child(count.toString()).child('sups').child(
+                  counter.toString()).update({
+                'n': nameController.text
+              });
+              child.child(count.toString()).child('sups').child(
+                  counter.toString()).child('u').update({
+                'e0': emailController.text
+              });
+            } catch (e) {
+              child.child(count.toString()).child('sups').child(
+                  counter.toString()).update({
+                'n': nameController.text
+              });
+              child.child(count.toString()).child('sups').child(
+                  counter.toString()).child('u').update({
+                'e0': emailController.text
+              });
+            }
+            break;
+          }
+        }
+
+        signUp(emailController.text, passController.text).then((String msg) {
+          if (msg.isNotEmpty) {
+            registerMessage = "Usuário cadastrado com sucesso";
+            final snackBar = SnackBar(content: Text(registerMessage));
+            scaffoldKey.currentState.showSnackBar(snackBar);
+
+            _waitForUserToRead().then((value) {
+              Navigator.push(context, FadeRoute(
+                  page: Login()
+              ));
+            });
+
+            return;
+          }
+        });
+      });
+    }
+    else if (selectedFunction == "Líder de IC") {
+      if (selectedRegion == "Selecione uma Região") {
+        registerMessage = selectedRegion + "!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-      if (selectedSector == "Selecione um Setor"){
-        registerMessage = selectedSector+"!";
+      if (selectedSector == "Selecione um Setor") {
+        registerMessage = selectedSector + "!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-      if (selectedsupervision == "Selecione uma Supervisão"){
-        registerMessage = selectedsupervision+"!";
+      if (selectedSupervision == "Selecione uma Supervisão") {
+        registerMessage = selectedSupervision + "!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-      if (nameController.text.isEmpty || nameController.text.length < 4){
+      if (nameController.text.isEmpty || nameController.text.length < 4) {
         registerMessage = "Nome da IC inválido";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
+
+      var child;
+      selectedRegion == "Cinza" ?
+      child = FirebaseDatabase.instance.reference().child("regs")
+          .child("0").child("sets").orderByChild("n").equalTo(selectedSector)
+          .reference()
+          .orderByChild("n").equalTo(selectedSupervision)
+          .reference() :
+
+      selectedRegion == "Laranja" ?
+      child = FirebaseDatabase.instance.reference().child("regs")
+          .child("1").child("sets").orderByChild("n").equalTo(selectedSector)
+          .reference()
+          .orderByChild("n").equalTo(selectedSupervision)
+          .reference() :
+
+      child =
+          FirebaseDatabase.instance.reference().child("regs").child("2").child(
+              "sets")
+              .orderByChild("n").equalTo(selectedSector).reference()
+              .orderByChild("n").equalTo(selectedSupervision).reference();
+
+      child.once().then((DataSnapshot ds) {
+        List<dynamic> sets;
+        sets = new List<dynamic>.from(ds.value);
+
+        int setsCount = -1;
+        int supsCount = -1;
+        int countIcs = 0;
+
+        for (dynamic set in sets) {
+          setsCount++;
+
+          if (set['n'] == selectedSector) {
+            for (dynamic sup in set['sups']) {
+              supsCount++;
+
+              if (sup['n'] == selectedSupervision) {
+                try {
+                  var a = sup['ics'][0];
+
+                  for (dynamic ic in sup['ics']) {
+                    countIcs++;
+                  }
+
+                  child.child(setsCount.toString()).child('sups').child(
+                      supsCount.toString()).child('ics').child(
+                      countIcs.toString()).update({
+                    'n': nameController.text
+                  });
+
+                  child.child(setsCount.toString()).child('sups').child(
+                      supsCount.toString()).child('ics').child(
+                      countIcs.toString()).update({
+                    's': 0
+                  });
+
+                  child.child(setsCount.toString()).child('sups').child(
+                      supsCount.toString()).child('ics').child(
+                      countIcs.toString()).child('u').update({
+                    'e0': emailController.text
+                  });
+                } catch (e) {
+                  child.child(setsCount.toString()).child('sups').child(
+                      supsCount.toString()).child('ics').child('0').update({
+                    'n': nameController.text
+                  });
+
+                  child.child(setsCount.toString()).child('sups').child(
+                      supsCount.toString()).child('ics').child('0').update({
+                    's': 0
+                  });
+
+                  child.child(setsCount.toString()).child('sups').child(
+                      supsCount.toString()).child('ics').child('0')
+                      .child('u')
+                      .update({
+                    'e0': emailController.text
+                  });
+                }
+
+                break;
+              }
+            }
+          }
+        }
+
+        signUp(emailController.text, passController.text).then((String msg) {
+          if (msg.isNotEmpty) {
+            registerMessage = "Usuário cadastrado com sucesso";
+            final snackBar = SnackBar(content: Text(registerMessage));
+            scaffoldKey.currentState.showSnackBar(snackBar);
+
+            _waitForUserToRead().then((value) {
+              Navigator.push(context, FadeRoute(
+                  page: Login()
+              ));
+            });
+            return;
+          }
+        });
+      });
     }
   }
 
@@ -617,7 +808,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
           setState(() {
             selectedRegion = value;
             selectedSector = "Selecione um Setor";
-            selectedsupervision = "Selecione uma Supervisão";
+            selectedSupervision = "Selecione uma Supervisão";
             _updateSetoresList();
           });
         },
@@ -658,7 +849,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
       padding: EdgeInsets.fromLTRB(70, 0, 30, 20),
       child: DropdownButton<String>(
         hint: Text(
-          selectedsupervision,
+          selectedSupervision,
           style: Theme.of(context).textTheme.headline,
           textAlign: TextAlign.center,
         ),
@@ -673,7 +864,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
         }).toList(),
         onChanged: (value) {
           setState(() {
-            selectedsupervision = value;
+            selectedSupervision = value;
           });
         },
       ),
@@ -808,7 +999,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
               }
             }
           } catch(e){
-            selectedsupervision = "Selecione um Setor";
+            selectedSupervision = "Selecione um Setor";
           }
         }
 

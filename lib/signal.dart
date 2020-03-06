@@ -3,41 +3,49 @@ import 'package:timeline_list/timeline.dart';
 import 'package:maanaim_signal/timeline_data.dart';
 import 'package:timeline_list/timeline_model.dart';
 
+import 'maanaim_structure.dart';
+
 class Signal extends StatelessWidget {
-  Signal({Key key, this.function}) : super(key: key);
-  final int function;
+  Signal({Key key, this.ic}) : super(key: key);
+  final IC ic;
 
   @override
   Widget build(BuildContext context) {
-
-    final Map<bool,String> map = ModalRoute.of(context).settings.arguments;
 
     return MaterialApp(
       title: 'Semáforo',
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: SignalPage(title: 'Semáforo', map: map, function: function),
+      home: SignalPage(title: ic.n, ic: ic),
     );
   }
 }
 
 class SignalPage extends StatefulWidget {
-  SignalPage({Key key, this.title, this.map, this.function}) : super(key: key);
+  SignalPage({Key key, this.title, this.ic, this.function}) : super(key: key);
   final int function;
   final String title;
-  final Map<bool,String> map;
+  final IC ic;
 
   @override
-  _SignalPageState createState() => _SignalPageState();
+  _SignalPageState createState() => _SignalPageState(ic: ic);
 }
 
 class _SignalPageState extends State<SignalPage> {
+  _SignalPageState({Key key, this.ic});
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final PageController pageController =
   PageController(initialPage: 1, keepPage: true);
   int pageIx = 1;
+  IC ic;
+
+  @override
+  void initState() {
+    print(ic.n);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

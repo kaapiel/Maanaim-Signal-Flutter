@@ -39,19 +39,22 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
   String selectedFunction = "Selecione sua função";
   String selectedRegion = "Selecione uma Região";
   String selectedSector = "Selecione um Setor";
-  String selectedsupervision = "Selecione uma Supervisão";
-  final emailController = TextEditingController();
-  final nameController = TextEditingController();
+  String selectedSupervision = "Selecione uma Supervisão";
   List<String> functions = new List<String>();
   List<String> setores = new List<String>();
   List<String> regioes = new List<String>();
   List<String> supervisoes = new List<String>();
   String email;
+  TextEditingController emailController;
+  TextEditingController nameController;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   @override
   void initState() {
+
     email = widget.map.values.first;
+    emailController = TextEditingController(text: email);
+    nameController = TextEditingController();
     functions.add("Pr. Presidente");
     functions.add("Pr. de Região");
     functions.add("Líder de Setor");
@@ -95,12 +98,13 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
                 obscureText: false,
                 autofocus: false,
                 style: style,
+                enabled: false,
                 keyboardType: TextInputType.emailAddress,
                 maxLength: 50,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(
                         20.0, 15.0, 20.0, 15.0),
-                    hintText: "E-mail",
+                    hintText: widget.map.values.first,
                     icon: Icon(
                       Icons.mail,
                       color: Colors.grey,
@@ -133,7 +137,7 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
                     selectedFunction = value;
                     selectedRegion = "Selecione uma Região";
                     selectedSector = "Selecione um Setor";
-                    selectedsupervision = "Selecione uma Supervisão";
+                    selectedSupervision = "Selecione uma Supervisão";
                   });
                 },
               ),
@@ -149,7 +153,7 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
                   minWidth: MediaQuery.of(context).size.width,
                   padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                   onPressed: () => _validateRegister(),
-                  child: Text( "Cadastrar",
+                  child: Text( "Atualizar",
                     textAlign: TextAlign.center,
                     style: style.copyWith(
                         color: Colors.white,
@@ -184,7 +188,7 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
   }
 
   @override
-  Future<String> signIn(String email, String password) {
+  Future<Map<String, FirebaseUser>> signIn(String email, String password) {
     return null;
   }
 
@@ -232,9 +236,6 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
       return _getSupervisaoContainer("Nome da supervisão");
 
     } else if (selectedFunction == "Líder de IC"){
-      //get regioes
-      //get setores
-      //get supervisoes
       return _getICContainer("Nome da IC");
     }
     return SizedBox(
@@ -249,7 +250,8 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
       final snackBar = SnackBar(content: Text(registerMessage));
       scaffoldKey.currentState.showSnackBar(snackBar);
       return;
-    } else if (selectedFunction == "Pr. Presidente") {
+    }
+    else if (selectedFunction == "Pr. Presidente") {
 
       var child = FirebaseDatabase.instance.reference().child("u");
       child.once().then((DataSnapshot ds){
@@ -300,7 +302,8 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
         }
       });
 
-    } else if (selectedFunction == "Pr. de Região") {
+    }
+    else if (selectedFunction == "Pr. de Região") {
       if (selectedRegion == "Selecione uma Região"){
         registerMessage = selectedRegion+"!";
         final snackBar = SnackBar(content: Text(registerMessage));
@@ -357,72 +360,72 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
         });
 
       }
-    } else if (selectedFunction == "Líder de Setor") {
+    }
+    else if (selectedFunction == "Líder de Setor") {
       if (selectedRegion == "Selecione uma Região"){
         registerMessage = selectedRegion+"!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
-      } else {
-
-        var child;
-        selectedRegion == "Cinza" ? child = FirebaseDatabase.instance.reference().child("regs").child("0").child("u") :
-        selectedRegion == "Laranja" ? child = FirebaseDatabase.instance.reference().child("regs").child("1").child("u") :
-        child = FirebaseDatabase.instance.reference().child("regs").child("2").child("u");
-
-
-        child.once().then((DataSnapshot ds){
-
-          Map<String, dynamic> map;
-          try {
-            map = new Map<String, dynamic>.from(ds.value);
-          } catch(e){
-            child.set({
-              'e0':emailController.text
-            });
-
-            registerMessage = "Usuário atualizado com sucesso";
-            final snackBar = SnackBar(content: Text(registerMessage));
-            scaffoldKey.currentState.showSnackBar(snackBar);
-
-            _waitForUserToRead().then((value){
-              Navigator.push(context, FadeRoute(
-                  page: Login()
-              ));
-            });
-            return;
-          }
-
-          var currentValue = map.keys.last.split("e")[1];
-          var newValue = int.parse(currentValue) + 1;
-          String newKey = "e" + newValue.toString();
-
-          child.update({
-            newKey:emailController.text
-          });
-
-          registerMessage = "Usuário atualizado com sucesso";
-          final snackBar = SnackBar(content: Text(registerMessage));
-          scaffoldKey.currentState.showSnackBar(snackBar);
-
-          _waitForUserToRead().then((value){
-            Navigator.push(context, FadeRoute(
-                page: Login()
-            ));
-          });
-        });
-
-
-
-
       }
       if (nameController.text.isEmpty || nameController.text.length < 4){
         registerMessage = "Nome do setor inválido";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
+      } else {
+
+        var child;
+        selectedRegion == "Cinza" ? child = FirebaseDatabase.instance.reference().child("regs").child("0").child("sets") :
+        selectedRegion == "Laranja" ? child = FirebaseDatabase.instance.reference().child("regs").child("1").child("sets") :
+        child = FirebaseDatabase.instance.reference().child("regs").child("2").child("sets");
+
+        child.once().then((DataSnapshot ds){
+
+          List<dynamic> list;
+
+          try {
+
+            list = new List<dynamic>.from(ds.value);
+
+            int size = 0;
+
+            for(dynamic o in list){
+              size++;
+            }
+
+            child.child(size.toString()).update({
+              'n':nameController.text
+            });
+            child.child(size.toString()).child('u').update({
+              'e0':emailController.text
+            });
+
+          } catch(e){
+
+            child.child('0').update({
+              'n':nameController.text
+            });
+            child.child('0').child('u').update({
+              'e0':emailController.text
+            });
+
+          }
+
+          registerMessage = "Usuário atualizado com sucesso";
+          final snackBar = SnackBar(content: Text(registerMessage));
+          scaffoldKey.currentState.showSnackBar(snackBar);
+
+          _waitForUserToRead().then((value){
+            Navigator.push(context, FadeRoute(
+                page: Login()
+            ));
+          });
+
+        });
       }
-    } else if (selectedFunction == "Supervisor") {
+    }
+    else if (selectedFunction == "Supervisor") {
       if (selectedRegion == "Selecione uma Região"){
         registerMessage = selectedRegion+"!";
         final snackBar = SnackBar(content: Text(registerMessage));
@@ -441,7 +444,67 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-    } else if (selectedFunction == "Líder de IC") {
+
+      var child;
+      selectedRegion == "Cinza" ? child = FirebaseDatabase.instance.reference().child("regs")
+          .child("0").child("sets").orderByChild("n").equalTo(selectedSector).reference() :
+
+      selectedRegion == "Laranja" ? child = FirebaseDatabase.instance.reference().child("regs")
+          .child("1").child("sets").orderByChild("n").equalTo(selectedSector).reference() :
+
+      child = FirebaseDatabase.instance.reference().child("regs").child("2").child("sets")
+          .orderByChild("n").equalTo(selectedSector).reference();
+
+      child.once().then((DataSnapshot ds){
+
+        List<dynamic> list;
+        list = new List<dynamic>.from(ds.value);
+
+        int count = -1;
+        int counter = 0;
+        for(dynamic obj in list){
+          count++;
+          if(obj['n'] == selectedSector){
+
+            try {
+              var a = obj['sups'][0];
+
+              for(dynamic sup in obj['sups']){
+                counter++;
+              }
+              child.child(count.toString()).child('sups').child(counter.toString()).update({
+                'n':nameController.text
+              });
+              child.child(count.toString()).child('sups').child(counter.toString()).child('u').update({
+                'e0':emailController.text
+              });
+
+            } catch(e){
+              child.child(count.toString()).child('sups').child(counter.toString()).update({
+                'n':nameController.text
+              });
+              child.child(count.toString()).child('sups').child(counter.toString()).child('u').update({
+                'e0':emailController.text
+              });
+            }
+            break;
+          }
+        }
+
+        registerMessage = "Usuário atualizado com sucesso";
+        final snackBar = SnackBar(content: Text(registerMessage));
+        scaffoldKey.currentState.showSnackBar(snackBar);
+
+        _waitForUserToRead().then((value){
+          Navigator.push(context, FadeRoute(
+              page: Login()
+          ));
+        });
+
+      });
+
+    }
+    else if (selectedFunction == "Líder de IC") {
       if (selectedRegion == "Selecione uma Região"){
         registerMessage = selectedRegion+"!";
         final snackBar = SnackBar(content: Text(registerMessage));
@@ -454,8 +517,8 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
-      if (selectedsupervision == "Selecione uma Supervisão"){
-        registerMessage = selectedsupervision+"!";
+      if (selectedSupervision == "Selecione uma Supervisão"){
+        registerMessage = selectedSupervision+"!";
         final snackBar = SnackBar(content: Text(registerMessage));
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
@@ -466,6 +529,89 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
         scaffoldKey.currentState.showSnackBar(snackBar);
         return;
       }
+
+      var child;
+      selectedRegion == "Cinza" ? child = FirebaseDatabase.instance.reference().child("regs")
+          .child("0").child("sets").orderByChild("n").equalTo(selectedSector).reference()
+          .orderByChild("n").equalTo(selectedSupervision).reference() :
+
+      selectedRegion == "Laranja" ? child = FirebaseDatabase.instance.reference().child("regs")
+          .child("1").child("sets").orderByChild("n").equalTo(selectedSector).reference()
+          .orderByChild("n").equalTo(selectedSupervision).reference() :
+
+      child = FirebaseDatabase.instance.reference().child("regs").child("2").child("sets")
+          .orderByChild("n").equalTo(selectedSector).reference()
+          .orderByChild("n").equalTo(selectedSupervision).reference();
+
+      child.once().then((DataSnapshot ds){
+
+        List<dynamic> sets;
+        sets = new List<dynamic>.from(ds.value);
+
+        int setsCount = -1;
+        int supsCount = -1;
+        int countIcs = 0;
+
+        for(dynamic set in sets) {
+          setsCount++;
+
+          if(set['n'] == selectedSector){
+
+            for (dynamic sup in set['sups']) {
+              supsCount++;
+
+              if(sup['n'] == selectedSupervision){
+
+                try{
+
+                  var a = sup['ics'][0];
+
+                  for(dynamic ic in sup['ics']){
+                    countIcs++;
+                  }
+
+                  child.child(setsCount.toString()).child('sups').child(supsCount.toString()).child('ics').child(countIcs.toString()).update({
+                    'n':nameController.text
+                  });
+
+                  child.child(setsCount.toString()).child('sups').child(supsCount.toString()).child('ics').child(countIcs.toString()).update({
+                    's':0
+                  });
+
+                  child.child(setsCount.toString()).child('sups').child(supsCount.toString()).child('ics').child(countIcs.toString()).child('u').update({
+                    'e0':emailController.text
+                  });
+
+                }catch(e){
+                  child.child(setsCount.toString()).child('sups').child(supsCount.toString()).child('ics').child('0').update({
+                    'n':nameController.text
+                  });
+
+                  child.child(setsCount.toString()).child('sups').child(supsCount.toString()).child('ics').child('0').update({
+                    's':0
+                  });
+
+                  child.child(setsCount.toString()).child('sups').child(supsCount.toString()).child('ics').child('0').child('u').update({
+                    'e0':emailController.text
+                  });
+                }
+
+                break;
+              }
+            }
+          }
+        }
+
+        registerMessage = "Usuário atualizado com sucesso";
+        final snackBar = SnackBar(content: Text(registerMessage));
+        scaffoldKey.currentState.showSnackBar(snackBar);
+
+        _waitForUserToRead().then((value){
+          Navigator.push(context, FadeRoute(
+              page: Login()
+          ));
+        });
+      });
     }
   }
 
@@ -521,7 +667,7 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
           setState(() {
             selectedRegion = value;
             selectedSector = "Selecione um Setor";
-            selectedsupervision = "Selecione uma Supervisão";
+            selectedSupervision = "Selecione uma Supervisão";
             _updateSetoresList();
           });
         },
@@ -550,6 +696,7 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
         onChanged: (value) {
           setState(() {
             selectedSector = value;
+            selectedSupervision = "Selecione uma Supervisão";
             _updateSupervisionList();
           });
         },
@@ -562,7 +709,7 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
       padding: EdgeInsets.fromLTRB(70, 0, 30, 20),
       child: DropdownButton<String>(
         hint: Text(
-          selectedsupervision,
+          selectedSupervision,
           style: Theme.of(context).textTheme.headline,
           textAlign: TextAlign.center,
         ),
@@ -577,7 +724,7 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
         }).toList(),
         onChanged: (value) {
           setState(() {
-            selectedsupervision = value;
+            selectedSupervision = value;
           });
         },
       ),
@@ -712,7 +859,7 @@ class _ContinueRegisterPageState extends State<ContinueRegisterPage> implements 
               }
             }
           } catch(e){
-            selectedsupervision = "Selecione um Setor";
+            selectedSupervision = "Selecione uma Supervisão";
           }
         }
 

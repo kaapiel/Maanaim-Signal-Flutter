@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maanaim_signal/continue_register.dart';
 import 'package:maanaim_signal/logged_in_filters.dart';
+import 'package:maanaim_signal/maanaim_structure.dart';
 import 'package:maanaim_signal/register.dart';
 import 'package:maanaim_signal/sign_in.dart';
+import 'package:maanaim_signal/signal.dart';
 
 class Login extends StatelessWidget {
 
@@ -58,7 +60,6 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
       body: Center(
         child: ListView(
           children: <Widget>[
-
             Container (
               width: 300,
               height: 200,
@@ -191,12 +192,28 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
       return;
     }
 
-    signIn(email, pass).then((String msg) {
-      final snackBar = SnackBar(content: Text(msg));
+    signIn(email, pass).then((Map<String, FirebaseUser> map) {
+      final snackBar = SnackBar(content: Text(map.keys.first));
       scaffoldKey.currentState.showSnackBar(snackBar);
+
+      _waitForUserToRead();
+
+      FirebaseDatabase.instance.reference().once().then((DataSnapshot ds){
+        var firebaseRetrieveData = new Map<String, dynamic>.from(ds.value);
+
+        //logou?
+        if(map.values.first != null){
+          var structure = _privilegies(MaanaimStructure.fromJson(firebaseRetrieveData), email);
+          _redirectLogin(structure);
+        }
+      });
       return;
     });
 
+  }
+
+  _waitForUserToRead() async {
+    await Future.delayed(Duration(milliseconds: 1500));
   }
 
   Widget _facebookSignInButton() {
@@ -211,22 +228,11 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
               signInWithFacebook().then((Map<bool,String> map){
 
                 if (map.keys.first) {
-
                   FirebaseDatabase.instance.reference().once().then((DataSnapshot ds){
-
                     var firebaseRetrieveData = new Map<String, dynamic>.from(ds.value);
-
                     if (firebaseRetrieveData.toString().contains(map.values.first)){
-
-                      //mandar para admin/signal page
-                      Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return LoggedInFilters();
-                            },
-                          )
-                      );
-
+                      var structure = _privilegies(MaanaimStructure.fromJson(firebaseRetrieveData), map.values.first);
+                      _redirectLogin(structure);
                     } else {
                       Navigator.of(context).push(
                           MaterialPageRoute(
@@ -286,19 +292,11 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
               signInWithGoogle().then((Map<bool,String> map) {
 
                 if (map.keys.first) {
-
                   FirebaseDatabase.instance.reference().once().then((DataSnapshot ds){
-                    if (ds.toString().contains(map.values.first)){
-
-                      //mandar para admin/signal page
-                      Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return LoggedInFilters();
-                            },
-                          )
-                      );
-
+                    var firebaseRetrieveData = new Map<String, dynamic>.from(ds.value);
+                    if (firebaseRetrieveData.toString().contains(map.values.first)){
+                      var structure = _privilegies(MaanaimStructure.fromJson(firebaseRetrieveData), map.values.first);
+                      _redirectLogin(structure);
                     } else {
                       Navigator.of(context).push(
                           MaterialPageRoute(
@@ -348,9 +346,11 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
     );
   }
 
-  Future<String> signIn(String email, String password) async {
+  Future<Map<String, FirebaseUser>> signIn(String email, String password) async {
 
     AuthResult result;
+
+    authMessage = "Usuário autenticado com sucesso";
 
     try {
       result = await _firebaseAuth.signInWithEmailAndPassword(
@@ -365,12 +365,15 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
       } else if (e.toString().contains("ERROR_WRONG_PASSWORD")){
         authMessage = "Senha inválida";
       }
-      final snackBar = SnackBar(content: Text(authMessage));
-      scaffoldKey.currentState.showSnackBar(snackBar);
     }
 
     FirebaseUser user = result.user;
-    return user.uid;
+
+    final Map<String, FirebaseUser> map = {
+      authMessage: user,
+    };
+
+    return map;
   }
 
   Future<String> signUp(String email, String password) async {
@@ -394,6 +397,108 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
   Future<bool> isEmailVerified() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
     return user.isEmailVerified;
+  }
+
+  Object _privilegies(MaanaimStructure ms, String email){
+
+    //pr. presidente
+    if(ms != null && ms.u != null && ms.u.containsValue(email)){
+      return ms;
+    }
+
+    //pr. regiao
+    if(ms.regs != null){
+      for(Regiao r in ms.regs){
+        if(r.u != null && r.u.containsValue(email)){
+          return r;
+        }
+      }
+    }
+
+    //lider setor
+    if(ms.regs != null){
+      for(Regiao r in ms.regs){
+        if(r.sets != null){
+          for(Setor s in r.sets){
+            if(s.u != null && s.u.containsValue(email)){
+              return s;
+            }
+          }
+        }
+      }
+    }
+
+    //supervisor
+    if(ms.regs != null){
+      for(Regiao r in ms.regs){
+        if(r.sets != null){
+          for(Setor s in r.sets){
+            if(s.sups != null){
+              for(Supervisao sup in s.sups){
+                if(sup.u != null && sup.u.containsValue(email)){
+                  return sup;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    //ics
+    if(ms.regs != null){
+      for(Regiao r in ms.regs){
+        if(r.sets != null){
+          for(Setor s in r.sets){
+            if(s.sups != null){
+              for(Supervisao sup in s.sups){
+                if(sup.ics != null){
+                  for(IC i in sup.ics){
+                    if(i.u != null && i.u.containsValue(email)){
+                      return i;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  _redirectLogin(Object o) {
+
+    if (o is IC) {
+      print("Olá Líder de IC");
+      Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return Signal(ic: o);
+            },
+          )
+      );
+    } else {
+
+      if(o is MaanaimStructure){
+        print("Olá Pastor Presidente");
+      } else if (o is Regiao){
+        print("Olá Pastor de Regiao");
+      } else if (o is Setor){
+        print("Olá Líder de Setor");
+      } else if (o is Supervisao){
+        print("Olá Supervisor");
+      }
+
+      Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return LoggedInFilters(structure: o);
+            },
+          )
+      );
+
+    }
   }
 
 }

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "797419569448-o5u3ianvll95lctgirjclvlqhcjumkce.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "aguido.com.br.maanaim_signal",
+            "certificate_hash": "2c1a7c2c7a930c9ee218a49ddc896d1f02d4885b"
+          }
+        },
+        {
           "client_id": "797419569448-pq45db3ru6llgkrqvfh1voukfd5p30n9.apps.googleusercontent.com",
           "client_type": 3
         }

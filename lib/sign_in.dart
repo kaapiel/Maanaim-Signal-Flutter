@@ -82,7 +82,7 @@ void signOutGoogle() async{
 
 abstract class BaseAuth {
 
-  Future<String> signIn(String email, String password);
+  Future<Map<String, FirebaseUser>> signIn(String email, String password);
   Future<String> signUp(String email, String password);
   Future<FirebaseUser> getCurrentUser();
   Future<void> sendEmailVerification();
