@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:maanaim_signal/fade_transictions.dart';
 import 'package:maanaim_signal/login.dart';
@@ -41,6 +40,7 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
   final passController = TextEditingController();
   final confirmPassController = TextEditingController();
   final nameController = TextEditingController();
+  String authMessage = "";
   List<String> functions = new List<String>();
   List<String> setores = new List<String>();
   List<String> supervisoes = new List<String>();
@@ -308,13 +308,25 @@ class _RegisterPageState extends State<RegisterPage> implements BaseAuth {
   }
 
   _validateRegister() {
+
+    FirebaseDatabase.instance.reference().child("ae").once().then((DataSnapshot ds){
+      var firebaseRetrieveData = new Map<String, dynamic>.from(ds.value);
+      if(!firebaseRetrieveData.containsValue(emailController.text)){
+        print("Usuário não autorizado");
+        authMessage = "Usuário não autorizado";
+        final snackBar = SnackBar(content: Text(authMessage));
+        scaffoldKey.currentState.showSnackBar(snackBar);
+        return;
+      }
+    });
+
     if (emailController.text.isEmpty || passController.text.isEmpty || confirmPassController.text.isEmpty) {
       registerMessage = "Não podem haver campos vazios.";
       final snackBar = SnackBar(content: Text(registerMessage));
       scaffoldKey.currentState.showSnackBar(snackBar);
       return;
     }
-    else if (passController.text != confirmPassController.text) {
+     else if (passController.text != confirmPassController.text) {
       registerMessage = "As senhas não conferem";
       final snackBar = SnackBar(content: Text(registerMessage));
       scaffoldKey.currentState.showSnackBar(snackBar);

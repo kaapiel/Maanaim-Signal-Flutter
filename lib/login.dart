@@ -227,6 +227,16 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
             onPressed: () {
               signInWithFacebook().then((Map<bool,String> map){
 
+                FirebaseDatabase.instance.reference().child("ae").once().then((DataSnapshot ds){
+                  var firebaseRetrieveData = new Map<String, dynamic>.from(ds.value);
+                  if(!firebaseRetrieveData.containsValue(map.values.first)){
+                    authMessage = "Usuário não autorizado";
+                    final snackBar = SnackBar(content: Text(authMessage));
+                    scaffoldKey.currentState.showSnackBar(snackBar);
+                    return;
+                  }
+                });
+
                 if (map.keys.first) {
                   FirebaseDatabase.instance.reference().once().then((DataSnapshot ds){
                     var firebaseRetrieveData = new Map<String, dynamic>.from(ds.value);
@@ -290,6 +300,16 @@ class _LoginPageState extends State<LoginPage> implements BaseAuth {
             splashColor: Colors.grey,
             onPressed: () {
               signInWithGoogle().then((Map<bool,String> map) {
+
+                FirebaseDatabase.instance.reference().child("ae").once().then((DataSnapshot ds){
+                  var firebaseRetrieveData = new Map<String, dynamic>.from(ds.value);
+                  if(!firebaseRetrieveData.containsValue(map.values.first)){
+                    authMessage = "Usuário não autorizado";
+                    final snackBar = SnackBar(content: Text(authMessage));
+                    scaffoldKey.currentState.showSnackBar(snackBar);
+                    return;
+                  }
+                });
 
                 if (map.keys.first) {
                   FirebaseDatabase.instance.reference().once().then((DataSnapshot ds){

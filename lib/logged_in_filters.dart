@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:maanaim_signal/fade_transictions.dart';
 import 'package:maanaim_signal/maanaim_structure.dart';
@@ -45,29 +44,22 @@ class _LoggedInFiltersPageState extends State<LoggedInFiltersPage> {
   List<String> setores = new List<String>();
   List<String> regioes = new List<String>();
   List<String> supervisoes = new List<String>();
-  List<String> ics = new List<String>();
+  List<IC> ics = new List<IC>();
   Object structure;
   int function = 3;
   int redICs = 0;
   int yellowICs = 0;
   int greenICs = 0;
+  MaanaimStructure ms;
+  Regiao r;
+  Setor s;
+  Supervisao sup;
+  IC ic;
 
   @override
   void initState() {
-    regioes.add("Cinza");
-    regioes.add("Vermelha");
-    regioes.add("Laranja");
-
-    if(structure is MaanaimStructure){
-      function = 0;
-    } else if (structure is Regiao){
-      function = 1;
-    } else if (structure is Setor){
-      function = 2;
-    } else if (structure is Supervisao) {
-      function = 3;
-    }
-
+    _updateRegionsList();
+    _setFunction(structure);
     _countICsPerStatus(structure);
     super.initState();
   }
@@ -229,11 +221,11 @@ class _LoggedInFiltersPageState extends State<LoggedInFiltersPage> {
           style: Theme.of(context).textTheme.headline,
           textAlign: TextAlign.center,
         ),
-        items: ics.map((String value) {
+        items: ics.map((IC ic) {
           return DropdownMenuItem<String>(
-            value: value,
+            value: ic.n,
             child: Text(
-              value,
+              ic.n,
               textAlign: TextAlign.center,
             ),
           );
@@ -241,8 +233,13 @@ class _LoggedInFiltersPageState extends State<LoggedInFiltersPage> {
         onChanged: (value) {
           setState(() {
             selectedIC = value;
+            for(IC i in ics){
+              if(i.n == selectedIC){
+                ic = i;
+              }
+            }
             Navigator.push(context, FadeRoute(
-                page: Signal()
+                page: Signal(ic: ic)
             ));
           });
         },
@@ -272,6 +269,7 @@ class _LoggedInFiltersPageState extends State<LoggedInFiltersPage> {
         onChanged: (value) {
           setState(() {
             selectedSupervision = value;
+            _updateICsList();
           });
         },
       ),
@@ -299,6 +297,7 @@ class _LoggedInFiltersPageState extends State<LoggedInFiltersPage> {
         onChanged: (value) {
           setState(() {
             selectedSector = value;
+            _updateSupervisionsList();
           });
         },
       ),
@@ -326,6 +325,7 @@ class _LoggedInFiltersPageState extends State<LoggedInFiltersPage> {
         onChanged: (value) {
           setState(() {
             selectedRegion = value;
+            _updateSectorsList();
           });
         },
       ),
@@ -416,10 +416,111 @@ class _LoggedInFiltersPageState extends State<LoggedInFiltersPage> {
           }
         }
       }
-
-
     }
-
   }
 
+  void _setFunction(Object structure) {
+
+    if(structure is MaanaimStructure){
+      function = 0;
+      ms = structure;
+    } else if (structure is Regiao){
+      function = 1;
+      r = structure;
+    } else if (structure is Setor){
+      function = 2;
+      s = structure;
+    } else if (structure is Supervisao) {
+      function = 3;
+      sup = structure;
+    }
+  }
+
+  void _updateRegionsList() {
+    regioes.add("Cinza");
+    regioes.add("Laranja");
+    regioes.add("Vermelha");
+  }
+
+  void _updateSectorsList() {
+    for(Regiao r in ms.regs){
+      if(r.cor == selectedRegion){
+        for(Setor s in r.sets){
+          setores.add(s.n);
+        }
+      }
+    }
+  }
+
+  void _updateSupervisionsList() {
+
+    if(ms != null){
+      for(Regiao r in ms.regs){
+        if(r.cor == selectedRegion){
+          for(Setor s in r.sets){
+            if(s.n == selectedSector){
+              for(Supervisao sup in s.sups){
+                supervisoes.add(sup.n);
+              }
+            }
+          }
+        }
+      }
+    } else if (r != null){
+      if(r.cor == selectedRegion){
+        for(Setor s in r.sets){
+          if(s.n == selectedSector){
+            for(Supervisao sup in s.sups){
+              supervisoes.add(sup.n);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  void _updateICsList() {
+
+    if(ms != null){
+      for(Regiao r in ms.regs){
+        if(r.cor == selectedRegion){
+          for(Setor s in r.sets){
+            if(s.n == selectedSector){
+              for(Supervisao sup in s.sups){
+                if(sup.n == selectedSupervision){
+                  for(IC i in sup.ics){
+                    ics.add(i);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } else if (r != null){
+      if(r.cor == selectedRegion){
+        for(Setor s in r.sets){
+          if(s.n == selectedSector){
+            for(Supervisao sup in s.sups){
+              if(sup.n == selectedSupervision){
+                for(IC i in sup.ics){
+                  ics.add(i);
+                }
+              }
+            }
+          }
+        }
+      }
+    } else if (s != null) {
+      if(s.n == selectedSector){
+        for(Supervisao sup in s.sups){
+          if(sup.n == selectedSupervision){
+            for(IC i in sup.ics){
+              ics.add(i);
+            }
+          }
+        }
+      }
+    }
+  }
 }
